@@ -112,3 +112,4 @@ Temporary Items
 # Custom
 
 !libs/*.jar
+*.txt
