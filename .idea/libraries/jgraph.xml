@@ -1,0 +1,31 @@
+<component name="libraryTable">
+  <library name="jgraph">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/logback-classic-1.2.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/commons-lang3-3.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/dsiutils-2.6.17.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/commons-text-1.8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/jgrapht-guava-1.5.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/jheaps-0.13.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/jgraphx-4.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/jgrapht-ext-1.5.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/antlr4-runtime-4.8-1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/jgrapht-demo-1.5.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/guava-29.0-jre.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/slf4j-api-1.7.30.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/fastutil-8.5.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/webgraph-big-3.6.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/logback-core-1.2.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/webgraph-3.6.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/jsap-20210129.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/commons-math3-3.6.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/jgrapht-opt-1.5.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/sux4j-5.2.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/jgrapht-io-1.5.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/jgrapht-unimi-dsi-1.5.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/jgrapht-core-1.5.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
