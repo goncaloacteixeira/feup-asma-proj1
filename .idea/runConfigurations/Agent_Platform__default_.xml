@@ -3,7 +3,7 @@
     <option name="ALTERNATIVE_JRE_PATH" value="openjdk-17" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="MAIN_CLASS_NAME" value="jade.Boot" />
-    <module name="feup-asma-proj1" />
+    <module name="feup-asma-proj1.main" />
     <option name="PROGRAM_PARAMETERS" value="-gui" />
     <method v="2">
       <option name="Make" enabled="true" />
