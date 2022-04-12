@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 group 'org.feup.asma.group3'
@@ -18,4 +19,8 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+application {
+    mainClassName = 'Launcher'
 }
