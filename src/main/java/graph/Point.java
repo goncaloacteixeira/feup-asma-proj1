@@ -2,7 +2,7 @@ package graph;
 
 import java.util.Objects;
 
-public abstract class Point {
+public class Point {
     private String name;
 
     public Point(String name) {

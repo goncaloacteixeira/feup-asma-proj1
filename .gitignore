@@ -113,5 +113,3 @@ Temporary Items
 
 !libs/*.jar
 *.txt
-
-**/*.dot
