@@ -1,5 +1,6 @@
 import agents.BillboardAgent;
 import agents.HelloWorldAgent;
+import agents.HumanAgent;
 import jade.Boot;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
@@ -27,12 +28,13 @@ public class Launcher {
 
     private static void launchAgents(ContainerController container) {
         try {
-            AgentController ac = container.createNewAgent("agente bue fixe", "agents.HelloWorldAgent", null);
-            AgentController ac2 = container.createNewAgent("Billboard", "agents.BillboardAgent", new Object[]{"HelloWorlders"});
-
-            ac2.start();
+            // AgentController ac = container.createNewAgent("agente bue fixe", "agents.HelloWorldAgent", null);
+            AgentController billboardController = container.createNewAgent("Billboard", "agents.BillboardAgent", new Object[]{"human-broadcast-service"});
+            billboardController.start();
             Thread.sleep(1000); // time to initialize
-            ac.start();
+
+            AgentController humanController = container.createNewAgent("Human1", HumanAgent.class.getName(), new Object[]{"sem1", "sta1"});
+            humanController.start();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);

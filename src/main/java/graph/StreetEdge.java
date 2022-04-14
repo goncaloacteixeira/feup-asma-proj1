@@ -9,7 +9,7 @@ public class StreetEdge extends Edge {
     }
 
     @Override
-    String getType() {
+    public String getType() {
         return "street";
     }
 

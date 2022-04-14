@@ -1,0 +1,45 @@
+package behaviours;
+
+import agents.HumanAgent;
+import graph.CityGraph;
+import graph.Edge;
+import graph.Point;
+import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.nio.DefaultAttribute;
+
+public class TravelBehaviour extends Behaviour {
+    private boolean done = false;
+    private int currentLocationIndex = 0;
+    private GraphPath<Point, DefaultWeightedEdge> path;
+
+    public TravelBehaviour(HumanAgent a, Graph<Point, DefaultWeightedEdge> graph, String srcPoint, String dstPoint) {
+        super(a);
+        this.path = CityGraph.getPathFromAtoB(graph, srcPoint, dstPoint);
+        System.out.println("Path is: " + CityGraph.printPath(graph, path));
+    }
+
+    @Override
+    public void action() {
+        Point pt1 = path.getVertexList().get(currentLocationIndex);
+        Point pt2 = path.getVertexList().get(currentLocationIndex + 1);
+        Edge edge = (Edge) path.getEdgeList().get(currentLocationIndex++);
+
+        String msg = String.format("Moving from [%s] to [%s] by %s", pt1, pt2, edge);
+
+        System.out.println(myAgent.getLocalName() + ":" + msg);
+        ((HumanAgent) myAgent).informMovement(msg);
+
+        if (currentLocationIndex == this.path.getLength()) {
+            this.done = true;
+        }
+    }
+
+    @Override
+    public boolean done() {
+        return this.done;
+    }
+}

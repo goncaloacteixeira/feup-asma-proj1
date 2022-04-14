@@ -9,7 +9,7 @@ public class SubwayEdge extends Edge {
     }
 
     @Override
-    String getType() {
+    public String getType() {
         return "subway";
     }
 
