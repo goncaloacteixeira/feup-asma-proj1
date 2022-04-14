@@ -26,7 +26,7 @@ import java.util.Map;
 public class CityGraph {
     private CityGraph() {}
 
-    public static void exportToDOTFile(String filename, Graph<Point, DefaultWeightedEdge> g) {
+    private static void exportToDOTFile(String filename, Graph<Point, DefaultWeightedEdge> g) {
         DOTExporter<Point, DefaultWeightedEdge> export = new DOTExporter<>();
         export.setVertexIdProvider(Point::toString);
         export.setVertexAttributeProvider((vertex) -> {
@@ -47,7 +47,7 @@ public class CityGraph {
         export.exportGraph(g, new File(filename));
     }
 
-    public static Graph<Point, DefaultWeightedEdge> getFromDOTFile(String filename) {
+    private static Graph<Point, DefaultWeightedEdge> getFromDOTFile(String filename) {
         DOTImporter<Point, DefaultWeightedEdge> importer = new DOTImporter<>();
         Graph<Point, DefaultWeightedEdge> g = new WeightedMultigraph<>(DefaultWeightedEdge.class);
 
@@ -109,7 +109,7 @@ public class CityGraph {
      * @param subwayWeight  weight for subway edges
      * @return  a graph with custom weights
      */
-    public static Graph<Point, DefaultWeightedEdge> importCustomWeights(String filename, int streetWeight, int roadWeight, int subwayWeight) {
+    public static Graph<Point, DefaultWeightedEdge> importGraph(String filename, int streetWeight, int roadWeight, int subwayWeight) {
         Graph<Point, DefaultWeightedEdge> graph = CityGraph.getFromDOTFile(filename);
         for (DefaultWeightedEdge edge : graph.edgeSet()) {
             if (edge instanceof StreetEdge && streetWeight > 0)
@@ -120,6 +120,10 @@ public class CityGraph {
                 graph.setEdgeWeight(edge, subwayWeight);
         }
         return graph;
+    }
+
+    public static Graph<Point, DefaultWeightedEdge> importGraph(String filename) {
+        return CityGraph.getFromDOTFile(filename);
     }
 
     public static String printPath(Graph<Point, DefaultWeightedEdge> graph, GraphPath<Point, DefaultWeightedEdge> path) {
@@ -142,7 +146,7 @@ public class CityGraph {
         exportToDOTFile("citygraph.dot", graph);
 
         // example for a graph without roads (road weight too high)
-        graph = importCustomWeights("citygraph.dot", 0, Integer.MAX_VALUE, 0);
+        graph = importGraph("citygraph.dot", 0, Integer.MAX_VALUE, 0);
         path = getPathFromAtoB(graph, "sem1", "sta1");
         System.out.println(printPath(graph, path));
     }

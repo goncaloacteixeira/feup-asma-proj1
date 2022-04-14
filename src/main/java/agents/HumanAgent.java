@@ -26,7 +26,7 @@ public class HumanAgent extends Agent {
         this.dstPoint = (String) args[1];
 
         String broadcastMessage = String.format("I will go from %s to %s", srcPoint, dstPoint);
-        Graph<Point, DefaultWeightedEdge> graph = CityGraph.importCustomWeights("citygraph.dot", 0, Integer.MAX_VALUE, 0);
+        Graph<Point, DefaultWeightedEdge> graph = CityGraph.importGraph("citygraph.dot");
 
         addBehaviour(new BroadcastBehaviour(this, ACLMessage.INFORM, broadcastMessage, this.broadcastService));
         addBehaviour(new TravelBehaviour(this, graph, srcPoint, dstPoint));

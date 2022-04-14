@@ -13,11 +13,13 @@ public class TravelBehaviour extends Behaviour {
     private boolean done = false;
     private int currentLocationIndex = 0;
     private GraphPath<Point, DefaultWeightedEdge> path;
+    private final Graph<Point, DefaultWeightedEdge> graph;
 
     public TravelBehaviour(HumanAgent a, Graph<Point, DefaultWeightedEdge> graph, String srcPoint, String dstPoint) {
         super(a);
+        this.graph = graph;
         this.path = CityGraph.getPathFromAtoB(graph, srcPoint, dstPoint);
-        System.out.println("Path is: " + CityGraph.printPath(graph, path));
+        System.out.println(myAgent.getLocalName() + ": Path is: " + CityGraph.printPath(graph, path));
     }
 
     @Override
