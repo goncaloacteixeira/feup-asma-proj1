@@ -88,11 +88,29 @@ public class CityGraph {
         return iPaths.getPath(Point.instance(b));
     }
 
-    public static Graph<Point, DefaultWeightedEdge> importWithNoRoads(String filename) {
+    /**
+     * This method allows to import a graph with custom weight settings, for every weight property, if you assign
+     * a non-positive value (less than or equal to zero) the weight is unchanged. You can force the shortest path
+     * to not follow a certain type of edge you can assign Integer.MAX_VALUE.
+     *
+     * We shouldn't totally remove edges since it may lead to a non-connected graph. The graph is connected on
+     * street edges tho.
+     *
+     * @param filename      filename for the graph.dot
+     * @param streetWeight  weight for street edges (walking)
+     * @param roadWeight    weight for road edges (car/uber)
+     * @param subwayWeight  weight for subway edges
+     * @return  a graph with custom weights
+     */
+    public static Graph<Point, DefaultWeightedEdge> importCustomWeights(String filename, int streetWeight, int roadWeight, int subwayWeight) {
         Graph<Point, DefaultWeightedEdge> graph = CityGraph.getFromDOTFile(filename);
         for (DefaultWeightedEdge edge : graph.edgeSet()) {
-            if (edge instanceof RoadEdge)
-                graph.setEdgeWeight(edge, Integer.MAX_VALUE);
+            if (edge instanceof StreetEdge && streetWeight > 0)
+                graph.setEdgeWeight(edge, streetWeight);
+            if (edge instanceof RoadEdge && roadWeight > 0)
+                graph.setEdgeWeight(edge, roadWeight);
+            if (edge instanceof SubwayEdge && subwayWeight > 0)
+                graph.setEdgeWeight(edge, subwayWeight);
         }
         return graph;
     }
@@ -116,7 +134,8 @@ public class CityGraph {
 
         exportToDOTFile("citygraph.dot", graph);
 
-        graph = importWithNoRoads("citygraph.dot");
+        // example for a graph without roads (road weight too high)
+        graph = importCustomWeights("citygraph.dot", 0, Integer.MAX_VALUE, 0);
         path = getPathFromAtoB(graph, "sem1", "sta1");
         System.out.println(printPath(graph, path));
     }
