@@ -25,6 +25,7 @@ public class CityGraph {
         export.setVertexAttributeProvider((vertex) -> {
             Map<String, Attribute> map = new LinkedHashMap<>();
             map.put("type", DefaultAttribute.createAttribute(vertex.getClass().getSimpleName().toLowerCase(Locale.ROOT)));
+            map.put("color", DefaultAttribute.createAttribute(((Colorable) vertex).getColor()));
             return map;
         });
 
@@ -33,6 +34,7 @@ public class CityGraph {
             map.put("weight", DefaultAttribute.createAttribute(g.getEdgeWeight(edge)));
             map.put("label", DefaultAttribute.createAttribute(edge.toString()));
             map.put("type", DefaultAttribute.createAttribute(((Edge) edge).getType()));
+            map.put("color", DefaultAttribute.createAttribute(((Colorable) edge).getColor()));
             return map;
         });
         export.exportGraph(g, new File(filename));
@@ -111,6 +113,8 @@ public class CityGraph {
         Graph<Point, DefaultWeightedEdge> graph = getFromDOTFile("citygraph.dot");
         GraphPath<Point, DefaultWeightedEdge> path = getPathFromAtoB(graph, "sem1", "sta1");
         System.out.println(printPath(graph, path));
+
+        exportToDOTFile("citygraph.dot", graph);
 
         graph = importWithNoRoads("citygraph.dot");
         path = getPathFromAtoB(graph, "sem1", "sta1");

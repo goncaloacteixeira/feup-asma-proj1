@@ -2,7 +2,7 @@ package graph;
 
 import java.util.Objects;
 
-public class Point {
+public class Point implements Colorable {
     private String name;
 
     public Point(String name) {
@@ -44,5 +44,10 @@ public class Point {
                 return super.toString();
             }
         };
+    }
+
+    @Override
+    public String getColor() {
+        return Colorable.STREET_COLOR;
     }
 }

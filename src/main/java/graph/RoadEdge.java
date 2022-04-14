@@ -12,4 +12,9 @@ public class RoadEdge extends Edge {
     String getType() {
         return "road";
     }
+
+    @Override
+    public String getColor() {
+        return Colorable.ROAD_COLOR;
+    }
 }

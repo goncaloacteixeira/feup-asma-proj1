@@ -12,4 +12,9 @@ public class SubwayEdge extends Edge {
     String getType() {
         return "subway";
     }
+
+    @Override
+    public String getColor() {
+        return Colorable.SUBWAY_COLOR;
+    }
 }
