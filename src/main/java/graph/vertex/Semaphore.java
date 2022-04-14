@@ -1,4 +1,6 @@
-package graph;
+package graph.vertex;
+
+import graph.Colorable;
 
 public class Semaphore extends Point {
     public Semaphore(String name) {

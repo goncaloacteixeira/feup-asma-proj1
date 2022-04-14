@@ -1,4 +1,6 @@
-package graph;
+package graph.vertex;
+
+import graph.Colorable;
 
 import java.util.Objects;
 

@@ -1,6 +1,6 @@
-package graph;
+package graph.edge;
 
-import org.jgrapht.graph.DefaultWeightedEdge;
+import graph.Colorable;
 
 public class StreetEdge extends Edge {
     @Override

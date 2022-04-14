@@ -3,7 +3,7 @@ package agents;
 import behaviours.BroadcastBehaviour;
 import behaviours.TravelBehaviour;
 import graph.CityGraph;
-import graph.Point;
+import graph.vertex.Point;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import org.jgrapht.Graph;

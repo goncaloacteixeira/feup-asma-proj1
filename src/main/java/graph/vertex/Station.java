@@ -1,4 +1,6 @@
-package graph;
+package graph.vertex;
+
+import graph.Colorable;
 
 public class Station extends Point {
     public Station(String name) {

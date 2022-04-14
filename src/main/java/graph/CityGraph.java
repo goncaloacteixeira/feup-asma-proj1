@@ -1,5 +1,12 @@
 package graph;
 
+import graph.edge.Edge;
+import graph.edge.RoadEdge;
+import graph.edge.StreetEdge;
+import graph.edge.SubwayEdge;
+import graph.vertex.Point;
+import graph.vertex.Semaphore;
+import graph.vertex.Station;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;

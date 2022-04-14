@@ -2,14 +2,12 @@ package behaviours;
 
 import agents.HumanAgent;
 import graph.CityGraph;
-import graph.Edge;
-import graph.Point;
-import jade.core.Agent;
+import graph.edge.Edge;
+import graph.vertex.Point;
 import jade.core.behaviours.Behaviour;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.nio.DefaultAttribute;
 
 public class TravelBehaviour extends Behaviour {
     private boolean done = false;
