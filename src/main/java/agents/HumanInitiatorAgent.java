@@ -12,6 +12,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import utils.ServiceUtils;
 
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -31,7 +32,11 @@ public class HumanInitiatorAgent extends Agent {
         this.dstPoint = (String) args[1];
 
         String broadcastMessage = String.format("I will go from %s to %s", srcPoint, dstPoint);
-        Graph<Point, DefaultWeightedEdge> graph = CityGraph.importGraph("citygraph.dot");
+        try {
+            Graph<Point, DefaultWeightedEdge> graph = CityGraph.importGraph("citygraph.dot");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         ServiceUtils.register(this, "human-initiators");
 
         addBehaviour(new BroadcastBehaviour(this, ACLMessage.INFORM, broadcastMessage, this.broadcastService));

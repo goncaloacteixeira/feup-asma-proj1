@@ -9,6 +9,8 @@ import jade.lang.acl.ACLMessage;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
+import java.io.FileNotFoundException;
+
 public class HumanAgent extends Agent {
     private final String broadcastService;
     private String srcPoint;
@@ -26,10 +28,14 @@ public class HumanAgent extends Agent {
         this.dstPoint = (String) args[1];
 
         String broadcastMessage = String.format("I will go from %s to %s", srcPoint, dstPoint);
-        Graph<Point, DefaultWeightedEdge> graph = CityGraph.importGraph("citygraph.dot");
-
-        addBehaviour(new BroadcastBehaviour(this, ACLMessage.INFORM, broadcastMessage, this.broadcastService));
-        addBehaviour(new TravelBehaviour(this, graph, srcPoint, dstPoint));
+        Graph<Point, DefaultWeightedEdge> graph = null;
+        try {
+            graph = CityGraph.importGraph("citygraph.dot");
+            addBehaviour(new BroadcastBehaviour(this, ACLMessage.INFORM, broadcastMessage, this.broadcastService));
+            addBehaviour(new TravelBehaviour(this, graph, srcPoint, dstPoint));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void informMovement(String message) {

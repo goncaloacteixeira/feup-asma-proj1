@@ -19,7 +19,8 @@ import org.jgrapht.nio.DefaultAttribute;
 import org.jgrapht.nio.dot.DOTExporter;
 import org.jgrapht.nio.dot.DOTImporter;
 
-import java.io.File;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -27,7 +28,7 @@ import java.util.Map;
 public class CityGraph {
     private CityGraph() {}
 
-    private static void exportToDOTFile(String filename, Graph<Point, DefaultWeightedEdge> g) {
+    public static void exportToDOT(OutputStream outputStream, Graph<Point, DefaultWeightedEdge> g) {
         DOTExporter<Point, DefaultWeightedEdge> export = new DOTExporter<>();
         export.setVertexIdProvider(Point::toString);
         export.setVertexAttributeProvider((vertex) -> {
@@ -45,10 +46,10 @@ public class CityGraph {
             map.put("color", DefaultAttribute.createAttribute(((Colorable) edge).getColor()));
             return map;
         });
-        export.exportGraph(g, new File(filename));
+        export.exportGraph(g, outputStream);
     }
 
-    private static Graph<Point, DefaultWeightedEdge> getFromDOTFile(String filename) {
+    public static Graph<Point, DefaultWeightedEdge> getFromDOT(InputStream inputStream) {
         DOTImporter<Point, DefaultWeightedEdge> importer = new DOTImporter<>();
         Graph<Point, DefaultWeightedEdge> g = new WeightedMultigraph<>(DefaultWeightedEdge.class);
 
@@ -84,7 +85,7 @@ public class CityGraph {
 
             return edge;
         });
-        importer.importGraph(g, new File(filename));
+        importer.importGraph(g, inputStream);
 
         return g;
     }
@@ -110,8 +111,8 @@ public class CityGraph {
      * @param subwayWeight  weight for subway edges
      * @return  a graph with custom weights
      */
-    public static Graph<Point, DefaultWeightedEdge> importGraph(String filename, int streetWeight, int roadWeight, int subwayWeight) {
-        Graph<Point, DefaultWeightedEdge> graph = CityGraph.getFromDOTFile(filename);
+    public static Graph<Point, DefaultWeightedEdge> importGraph(String filename, int streetWeight, int roadWeight, int subwayWeight) throws FileNotFoundException {
+        Graph<Point, DefaultWeightedEdge> graph = CityGraph.getFromDOT(new FileInputStream(new File(filename)));
         for (DefaultWeightedEdge edge : graph.edgeSet()) {
             if (edge instanceof StreetEdge && streetWeight > 0)
                 graph.setEdgeWeight(edge, streetWeight);
@@ -123,8 +124,8 @@ public class CityGraph {
         return graph;
     }
 
-    public static Graph<Point, DefaultWeightedEdge> importGraph(String filename) {
-        return CityGraph.getFromDOTFile(filename);
+    public static Graph<Point, DefaultWeightedEdge> importGraph(String filename) throws FileNotFoundException {
+        return CityGraph.getFromDOT(new FileInputStream(new File(filename)));
     }
 
     public static String printPath(Graph<Point, DefaultWeightedEdge> graph, GraphPath<Point, DefaultWeightedEdge> path) {
@@ -160,14 +161,38 @@ public class CityGraph {
         return graphPath.getEndVertex();
     }
 
-    public static void main(String[] args) throws NoRoadsException {
-        Graph<Point, DefaultWeightedEdge> graph = getFromDOTFile("citygraph.dot");
+    public static void main(String[] args) throws NoRoadsException, IOException, ClassNotFoundException {
+        Graph<Point, DefaultWeightedEdge> graph = importGraph("citygraph.dot");
         GraphPath<Point, DefaultWeightedEdge> path = getPathFromAtoB(graph, "sem1", "sta3");
         System.out.println(printPath(graph, path));
 
         System.out.println("Road Stop:" + roadStop(graph, path));
 
-        exportToDOTFile("citygraph.dot", graph);
+        /* Example to Serialize and Deserialize */
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        exportToDOT(baos, graph);
+        String graphString = baos.toString(StandardCharsets.UTF_8);
+        ByteArrayInputStream bais = new ByteArrayInputStream(graphString.getBytes(StandardCharsets.UTF_8));
+        System.out.println("graph after deserialization: " + getFromDOT(bais));
+
+        // Serialize Deserialize Wrapper
+        GraphPointWrapper wrapper = new GraphPointWrapper(graphString, "sem1", "sem2");
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(os);
+        oos.writeObject(wrapper);
+        os.close();
+        oos.close();
+
+        byte[] bytes = os.toByteArray();
+
+        ByteArrayInputStream is = new ByteArrayInputStream(bytes);
+        ObjectInputStream ois = new ObjectInputStream(is);
+        GraphPointWrapper graphPointWrapper = (GraphPointWrapper) ois.readObject();
+        is.close();
+        ois.close();
+
+        System.out.println("After deserialization wrapper: " + graphPointWrapper.getGraph());
+
 
         // example for a graph without roads (road weight too high)
         graph = importGraph("citygraph.dot", 0, Integer.MAX_VALUE, 0);

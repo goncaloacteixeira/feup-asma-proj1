@@ -2,6 +2,7 @@ package graph.vertex;
 
 import graph.Colorable;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 public class Point implements Colorable {
@@ -46,6 +47,10 @@ public class Point implements Colorable {
                 return super.toString();
             }
         };
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override
