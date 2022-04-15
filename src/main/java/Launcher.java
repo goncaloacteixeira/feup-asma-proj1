@@ -40,7 +40,7 @@ public class Launcher {
                     new Object[]{"sem1", "sta3"}
             );
 
-            for (int i = 2; i < 12; i++) {
+            for (int i = 2; i < 4; i++) {
                 container.createNewAgent(
                         "Human" + i,
                         HumanResponderAgent.class.getName(),

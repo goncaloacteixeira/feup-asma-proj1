@@ -4,6 +4,7 @@ import graph.edge.Edge;
 import graph.edge.RoadEdge;
 import graph.edge.StreetEdge;
 import graph.edge.SubwayEdge;
+import graph.exceptions.NoRoadsException;
 import graph.vertex.Point;
 import graph.vertex.Semaphore;
 import graph.vertex.Station;
@@ -138,10 +139,33 @@ public class CityGraph {
         return result.toString();
     }
 
-    public static void main(String[] args) {
+    /**
+     * !IMPORTANT!
+     *
+     * GraphPath must start with a Semaphore Vertex!
+     *
+     * @param graph
+     * @param graphPath
+     * @return
+     */
+    public static Point roadStop(Graph<Point, DefaultWeightedEdge> graph, GraphPath<Point, DefaultWeightedEdge> graphPath) throws NoRoadsException {
+        for (DefaultWeightedEdge edge : graphPath.getEdgeList()) {
+            if (!(edge instanceof RoadEdge)) {
+                if (graphPath.getStartVertex().equals(graph.getEdgeSource(edge))) {
+                    throw new NoRoadsException();
+                }
+                return graph.getEdgeSource(edge);
+            }
+        }
+        return graphPath.getEndVertex();
+    }
+
+    public static void main(String[] args) throws NoRoadsException {
         Graph<Point, DefaultWeightedEdge> graph = getFromDOTFile("citygraph.dot");
-        GraphPath<Point, DefaultWeightedEdge> path = getPathFromAtoB(graph, "sem1", "sta1");
+        GraphPath<Point, DefaultWeightedEdge> path = getPathFromAtoB(graph, "sem1", "sta3");
         System.out.println(printPath(graph, path));
+
+        System.out.println("Road Stop:" + roadStop(graph, path));
 
         exportToDOTFile("citygraph.dot", graph);
 
@@ -149,5 +173,7 @@ public class CityGraph {
         graph = importGraph("citygraph.dot", 0, Integer.MAX_VALUE, 0);
         path = getPathFromAtoB(graph, "sem1", "sta1");
         System.out.println(printPath(graph, path));
+        // this will raise an exception
+        // System.out.println("Road Stop:" + roadStop(graph, path));
     }
 }

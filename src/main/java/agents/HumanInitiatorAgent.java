@@ -43,6 +43,7 @@ public class HumanInitiatorAgent extends Agent {
         msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
         msg.setContent("dummy-action");
 
+        // procurar malta que está a procura de carro
         DFAgentDescription[] agents = ServiceUtils.search(this, "human-responders");
 
         Arrays.stream(agents)
