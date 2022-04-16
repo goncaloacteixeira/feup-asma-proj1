@@ -31,24 +31,10 @@ public class Launcher {
             billboardController.start();
             Thread.sleep(1000); // time to initialize
 
-            // AgentController humanC1 = container.createNewAgent("Human1", HumanAgent.class.getName(), new Object[]{"sem1", "sta3"});
+            AgentController humanC1 = container.createNewAgent("Human1", HumanAgent.class.getName(), new Object[]{"sem1", "sem9"});
             // AgentController humanC2 = container.createNewAgent("Human2", HumanAgent.class.getName(), new Object[]{"sem2", "sta4"});
 
-            AgentController h1 = container.createNewAgent(
-                    "Human1",
-                    HumanInitiatorAgent.class.getName(),
-                    new Object[]{"sem1", "sta3"}
-            );
-
-            for (int i = 2; i < 4; i++) {
-                container.createNewAgent(
-                        "Human" + i,
-                        HumanResponderAgent.class.getName(),
-                        new Object[]{"sem1", "sta3"}
-                ).start();
-            }
-
-            h1.start();
+            humanC1.start();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);

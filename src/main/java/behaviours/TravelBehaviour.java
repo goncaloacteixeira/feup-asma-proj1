@@ -34,6 +34,7 @@ public class TravelBehaviour extends Behaviour {
         ((HumanAgent) myAgent).informMovement(msg);
 
         if (currentLocationIndex == this.path.getLength()) {
+            myAgent.doDelete();
             this.done = true;
         }
     }
