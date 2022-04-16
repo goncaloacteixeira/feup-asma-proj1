@@ -2,17 +2,24 @@ package behaviours;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.proto.ContractNetInitiator;
+import utils.ServiceUtils;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
+import java.util.function.Function;
 
 public class CarShareContractNetInitiator extends ContractNetInitiator {
     private int nResponders;
 
     public CarShareContractNetInitiator(Agent a, ACLMessage cfp, int nResponders) {
         super(a, cfp);
+
         this.nResponders = nResponders;
     }
 
@@ -71,4 +78,10 @@ public class CarShareContractNetInitiator extends ContractNetInitiator {
         System.out.println("Agent " + inform.getSender().getName() + " successfully performed the requested action");
     }
 
+    @Override
+    public int onEnd() {
+        System.out.println(myAgent.getLocalName() + ": onEnd()");
+        ServiceUtils.deregister(myAgent);
+        return 0;
+    }
 }

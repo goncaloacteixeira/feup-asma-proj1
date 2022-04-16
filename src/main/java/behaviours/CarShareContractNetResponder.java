@@ -7,6 +7,7 @@ import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.ContractNetResponder;
+import utils.ServiceUtils;
 
 public class CarShareContractNetResponder extends ContractNetResponder {
     public CarShareContractNetResponder(Agent a, MessageTemplate mt) {
@@ -57,5 +58,11 @@ public class CarShareContractNetResponder extends ContractNetResponder {
     private boolean performAction() {
         // Simulate action execution by generating a random number
         return (Math.random() > 0.2);
+    }
+
+    @Override
+    public int onEnd() {
+        System.out.println(myAgent.getLocalName() + ": onEnd()");
+        return 0;
     }
 }

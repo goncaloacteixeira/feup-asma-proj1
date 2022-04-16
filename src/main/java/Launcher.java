@@ -32,9 +32,14 @@ public class Launcher {
             Thread.sleep(1000); // time to initialize
 
             AgentController humanC1 = container.createNewAgent("Human1", HumanAgent.class.getName(), new Object[]{"sem1", "sem9"});
+            AgentController humanC2 = container.createNewAgent("Human2", HumanAgent.class.getName(), new Object[]{"sem1", "sem9"});
+            AgentController humanC3 = container.createNewAgent("Human3", HumanAgent.class.getName(), new Object[]{"sem1", "sem9"});
             // AgentController humanC2 = container.createNewAgent("Human2", HumanAgent.class.getName(), new Object[]{"sem2", "sta4"});
 
             humanC1.start();
+            Thread.sleep(1000);
+            humanC2.start();
+            // humanC3.start();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
