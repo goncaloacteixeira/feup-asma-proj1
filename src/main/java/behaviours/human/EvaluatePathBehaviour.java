@@ -8,6 +8,11 @@ class EvaluatePathBehaviour extends OneShotBehaviour {
     private final FSMHumanBehaviour fsmHumanBehaviour;
     private int exitValue;
 
+    /**
+     * Behaviour to evaluate if it is a road or default (street or subway) segment
+     *
+     * @param fsmHumanBehaviour parent behaviour
+     */
     public EvaluatePathBehaviour(FSMHumanBehaviour fsmHumanBehaviour) {
         this.fsmHumanBehaviour = fsmHumanBehaviour;
     }

@@ -12,6 +12,7 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.util.Pair;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
+
 class CNRHelperBehaviour extends Behaviour {
     private final FSMHumanBehaviour fsmHumanBehaviour;
     private MessageTemplate messageTemplate;
@@ -19,8 +20,13 @@ class CNRHelperBehaviour extends Behaviour {
     private boolean busy = false;
     private int attempts = 0;
 
-    public CNRHelperBehaviour(FSMHumanBehaviour fsmHumanBehaviour, Agent a) {
-        super(a);
+    /**
+     * Behaviour to create a new ContractNet Responder behaviour
+     *
+     * @param fsmHumanBehaviour parent behaviour
+     */
+    public CNRHelperBehaviour(FSMHumanBehaviour fsmHumanBehaviour) {
+        super(fsmHumanBehaviour.getAgent());
         this.fsmHumanBehaviour = fsmHumanBehaviour;
         this.messageTemplate = MessageTemplate.and(
                 MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET),
@@ -53,6 +59,10 @@ class CNRHelperBehaviour extends Behaviour {
         return super.onEnd();
     }
 
+    /**
+     * Busy waiting until a Call For Proposal is received or it timeouts. After receiving a CFP it
+     * starts a new Contract Net Responder behaviour
+     */
     @Override
     public void action() {
         if (!busy) {

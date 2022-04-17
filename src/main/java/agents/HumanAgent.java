@@ -24,20 +24,16 @@ public class HumanAgent extends Agent {
     @Override
     protected void setup() {
         Object[] args = this.getArguments();
-        this.srcPoint = (String) args[0];
-        this.dstPoint = (String) args[1];
-        this.settings = (HumanPreferences) args[2];
-
-        String broadcastMessage = String.format("I will go from %s to %s", srcPoint, dstPoint);
+        this.srcPoint = (String) args[0];               // Source Point for Travel
+        this.dstPoint = (String) args[1];               // Destiny Point for Travel
+        this.settings = (HumanPreferences) args[2];     // Preferences (weights and initiators)
 
         try {
+            // for each agent we need to import a new graph since weights vary from agent to agent
             Graph<Point, DefaultWeightedEdge> graph = GraphUtils.importGraph("citygraph.dot", settings.streetWeight, settings.roadWeight, settings.subwayWeight);
 
-            addBehaviour(new BroadcastBehaviour(this, ACLMessage.INFORM, broadcastMessage, this.broadcastService));
-
-            FSMHumanBehaviour humanBehaviour = new FSMHumanBehaviour(this, graph, srcPoint, dstPoint, settings.carShareInitiator);
-
-            addBehaviour(humanBehaviour);
+            // add Finite State Machine Behaviour
+            addBehaviour(new FSMHumanBehaviour(this, graph, srcPoint, dstPoint, settings));
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }

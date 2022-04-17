@@ -1,5 +1,7 @@
 package behaviours.human;
 
+import agents.HumanAgent;
+import agents.HumanPreferences;
 import graph.GraphUtils;
 import graph.edge.Edge;
 import graph.vertex.Point;
@@ -31,19 +33,16 @@ public class FSMHumanBehaviour extends FSMBehaviour {
     protected int currentLocationIndex = 0;
     protected Graph<Point, DefaultWeightedEdge> graph;
     protected GraphPath<Point, DefaultWeightedEdge> path;
-    protected boolean initiator;
+    protected HumanPreferences preferences;
 
-    public FSMHumanBehaviour(Agent a, Graph<Point, DefaultWeightedEdge> graph, String src, String dst, boolean initiator) {
+    public FSMHumanBehaviour(HumanAgent a, Graph<Point, DefaultWeightedEdge> graph, String src, String dst, HumanPreferences preferences) {
         super(a);
         this.graph = graph;
         this.path = GraphUtils.getPathFromAtoB(graph, src, dst);
-        this.initiator = initiator;
+        this.preferences = preferences;
 
-        if (initiator) {
-            ServiceUtils.register(myAgent, CAR_SHARE_INIT_SERVICE);
-        } else {
-            ServiceUtils.register(myAgent, CAR_SHARE_RESP_SERVICE);
-        }
+        // Humans either init car share or respond to car sharing when they start a new road travel
+        ServiceUtils.register(myAgent, preferences.isCarShareInitiator() ? CAR_SHARE_INIT_SERVICE : CAR_SHARE_RESP_SERVICE);
 
         System.out.printf("%s: Path: %s (Cost: %.02f)\n", myAgent.getLocalName(), path.getVertexList(), path.getWeight());
 
@@ -53,8 +52,8 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         this.registerState(new TravelDefaultBehaviour(this), STATE_TRD);
         this.registerState(new StartCarShareBehaviour(this), STATE_CAR);
         this.registerState(new TravelCarBehaviour(this), STATE_TRC);
-        this.registerState(new CNIHelperBehaviour(this, myAgent), STATE_CNI);
-        this.registerState(new CNRHelperBehaviour(this, myAgent), STATE_CNR);
+        this.registerState(new CNIHelperBehaviour(this), STATE_CNI);
+        this.registerState(new CNRHelperBehaviour(this), STATE_CNR);
 
         this.registerTransition(STATE_EVAL, STATE_CAR, EVENT_CAR);
         this.registerTransition(STATE_EVAL, STATE_DST, EVENT_DST);
@@ -71,6 +70,10 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         this.registerTransition(STATE_TRC, STATE_DST, EVENT_DST);
     }
 
+    /**
+     * Method to get string about traveling operations
+     * @return travel information
+     */
     public String informTravel() {
         Point pt1 = this.path.getVertexList().get(this.currentLocationIndex);
         Point pt2 = this.path.getVertexList().get(this.currentLocationIndex + 1);

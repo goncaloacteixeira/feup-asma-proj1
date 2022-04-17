@@ -24,8 +24,13 @@ class CNIHelperBehaviour extends Behaviour {
     private Pair<String, Boolean> done = Pair.of("done", false);
     private boolean busy = false;
 
-    public CNIHelperBehaviour(FSMHumanBehaviour fsmHumanBehaviour, Agent a) {
-        super(a);
+    /**
+     * Behaviour to create a new ContractNet Initiator behaviour
+     *
+     * @param fsmHumanBehaviour parent behaviour
+     */
+    public CNIHelperBehaviour(FSMHumanBehaviour fsmHumanBehaviour) {
+        super(fsmHumanBehaviour.getAgent());
         this.fsmHumanBehaviour = fsmHumanBehaviour;
         this.service = FSMHumanBehaviour.CAR_SHARE_RESP_SERVICE;
     }
@@ -55,6 +60,9 @@ class CNIHelperBehaviour extends Behaviour {
         return super.onEnd();
     }
 
+    /**
+     * This behaviour is busy waiting until the contract net initiator behavior ends
+     */
     @Override
     public void action() {
         if (!busy) {

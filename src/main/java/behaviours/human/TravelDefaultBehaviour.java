@@ -5,6 +5,10 @@ import jade.core.behaviours.OneShotBehaviour;
 class TravelDefaultBehaviour extends OneShotBehaviour {
     private final FSMHumanBehaviour fsmHumanBehaviour;
 
+    /**
+     * Simple behaviour to perform a traveling operation (by foot or subway)
+     * @param fsmHumanBehaviour parent behaviour
+     */
     public TravelDefaultBehaviour(FSMHumanBehaviour fsmHumanBehaviour) {
         this.fsmHumanBehaviour = fsmHumanBehaviour;
     }

@@ -30,4 +30,20 @@ public class HumanPreferences {
         this.subwayWeight = Double.MAX_VALUE;
         return this;
     }
+
+    public double getRoadWeight() {
+        return roadWeight;
+    }
+
+    public double getStreetWeight() {
+        return streetWeight;
+    }
+
+    public double getSubwayWeight() {
+        return subwayWeight;
+    }
+
+    public boolean isCarShareInitiator() {
+        return carShareInitiator;
+    }
 }

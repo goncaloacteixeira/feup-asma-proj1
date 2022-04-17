@@ -8,6 +8,12 @@ class TravelCarBehaviour extends OneShotBehaviour {
     private final FSMHumanBehaviour fsmHumanBehaviour;
     private int exitValue;
 
+    /**
+     * Travel by car, similar to TravelDefaultBehaviour but while there is road it keeps traveling,
+     * and if the point is the destination it jumps to DestinationBehaviour
+     *
+     * @param fsmHumanBehaviour parent behaviour
+     */
     public TravelCarBehaviour(FSMHumanBehaviour fsmHumanBehaviour) {
         this.fsmHumanBehaviour = fsmHumanBehaviour;
     }

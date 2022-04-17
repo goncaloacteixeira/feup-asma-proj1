@@ -6,6 +6,10 @@ import jade.core.behaviours.OneShotBehaviour;
 class DestinationBehaviour extends OneShotBehaviour {
     private final FSMHumanBehaviour fsmHumanBehaviour;
 
+    /**
+     * Final behaviour for Humans, reached final point on path
+     * @param fsmHumanBehaviour parent behaviour
+     */
     public DestinationBehaviour(FSMHumanBehaviour fsmHumanBehaviour) {
         this.fsmHumanBehaviour = fsmHumanBehaviour;
     }

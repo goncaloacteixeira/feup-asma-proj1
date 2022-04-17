@@ -6,6 +6,10 @@ class StartCarShareBehaviour extends OneShotBehaviour {
     private final FSMHumanBehaviour fsmHumanBehaviour;
     private int exitValue;
 
+    /**
+     * Behaviour to decide whether to join or initiate a car share
+     * @param fsmHumanBehaviour parent behaviour
+     */
     public StartCarShareBehaviour(FSMHumanBehaviour fsmHumanBehaviour) {
         this.fsmHumanBehaviour = fsmHumanBehaviour;
     }
@@ -13,7 +17,7 @@ class StartCarShareBehaviour extends OneShotBehaviour {
     @Override
     public void action() {
         System.out.println(myAgent.getLocalName() + ": Start Car Share...");
-        exitValue = fsmHumanBehaviour.initiator ? FSMHumanBehaviour.EVENT_INITIATE : FSMHumanBehaviour.EVENT_RESPOND;
+        exitValue = fsmHumanBehaviour.preferences.isCarShareInitiator() ? FSMHumanBehaviour.EVENT_INITIATE : FSMHumanBehaviour.EVENT_RESPOND;
     }
 
     @Override
