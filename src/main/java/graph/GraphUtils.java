@@ -112,7 +112,7 @@ public class GraphUtils {
      * @param subwayWeight  weight for subway edges
      * @return  a graph with custom weights
      */
-    public static Graph<Point, DefaultWeightedEdge> importGraph(String filename, int streetWeight, int roadWeight, int subwayWeight) throws FileNotFoundException {
+    public static Graph<Point, DefaultWeightedEdge> importGraph(String filename, double streetWeight, double roadWeight, double subwayWeight) throws FileNotFoundException {
         Graph<Point, DefaultWeightedEdge> graph = GraphUtils.getFromDOT(new FileInputStream(new File(filename)));
         for (DefaultWeightedEdge edge : graph.edgeSet()) {
             if (edge instanceof StreetEdge && streetWeight > 0)
