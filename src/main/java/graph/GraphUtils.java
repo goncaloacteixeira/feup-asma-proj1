@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 public class GraphUtils {
     private GraphUtils() {}
@@ -125,7 +126,7 @@ public class GraphUtils {
     }
 
     public static Graph<Point, DefaultWeightedEdge> importGraph(String filename) throws FileNotFoundException {
-        return GraphUtils.getFromDOT(new FileInputStream(new File(filename)));
+        return GraphUtils.getFromDOT(new FileInputStream(filename));
     }
 
     public static String printPath(Graph<Point, DefaultWeightedEdge> graph, GraphPath<Point, DefaultWeightedEdge> path) {
@@ -149,16 +150,31 @@ public class GraphUtils {
      * @param graphPath
      * @return
      */
-    public static Point roadStop(Graph<Point, DefaultWeightedEdge> graph, GraphPath<Point, DefaultWeightedEdge> graphPath) throws NoRoadsException {
-        for (DefaultWeightedEdge edge : graphPath.getEdgeList()) {
-            if (!(edge instanceof RoadEdge)) {
-                if (graphPath.getStartVertex().equals(graph.getEdgeSource(edge))) {
-                    throw new NoRoadsException();
-                }
-                return graph.getEdgeSource(edge);
-            }
+    public static Point roadStop(Graph<Point, DefaultWeightedEdge> graph, GraphPath<Point, DefaultWeightedEdge> graphPath, int currentIndex) throws NoRoadsException {
+        if (currentIndex == graphPath.getLength()) {
+            throw new NoRoadsException();
         }
-        return graphPath.getEndVertex();
+
+        Point stop = null;
+        for (int i = currentIndex; i < graphPath.getEdgeList().size(); i++) {
+            DefaultWeightedEdge edge = graphPath.getEdgeList().get(i);
+            if (!(edge instanceof RoadEdge)) {
+                break;
+            }
+            stop = graph.getEdgeTarget(edge);
+        }
+
+        if (stop == null) throw new NoRoadsException();
+
+        return stop;
+    }
+
+    public static double calculateCost(Graph<Point, DefaultWeightedEdge> graph, GraphPath<Point, DefaultWeightedEdge> path) {
+        double cost = 0.0;
+        for (DefaultWeightedEdge e : path.getEdgeList()) {
+            cost += graph.getEdgeWeight(e);
+        }
+        return cost;
     }
 
     public static void main(String[] args) throws NoRoadsException, IOException, ClassNotFoundException {
@@ -166,7 +182,7 @@ public class GraphUtils {
         GraphPath<Point, DefaultWeightedEdge> path = getPathFromAtoB(graph, "sem1", "sta3");
         System.out.println(printPath(graph, path));
 
-        System.out.println("Road Stop:" + roadStop(graph, path));
+        System.out.println("Road Stop:" + roadStop(graph, path, 1));
 
         /* Example to Serialize and Deserialize */
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

@@ -31,9 +31,8 @@ public class HumanAgent extends Agent {
 
         String broadcastMessage = String.format("I will go from %s to %s", srcPoint, dstPoint);
 
-        Graph<Point, DefaultWeightedEdge> graph = null;
         try {
-            graph = GraphUtils.importGraph("citygraph.dot");
+            Graph<Point, DefaultWeightedEdge> graph = GraphUtils.importGraph("citygraph.dot");
             addBehaviour(new BroadcastBehaviour(this, ACLMessage.INFORM, broadcastMessage, this.broadcastService));
 
             FSMHumanBehaviour humanBehaviour = new FSMHumanBehaviour(this, graph, srcPoint, dstPoint, initiator);

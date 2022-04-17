@@ -1,8 +1,11 @@
 package behaviours;
 
+import graph.GraphPointWrapper;
 import graph.GraphUtils;
+import graph.RoadPathPoints;
 import graph.edge.Edge;
 import graph.edge.RoadEdge;
+import graph.exceptions.NoRoadsException;
 import graph.vertex.Point;
 import jade.core.Agent;
 import jade.core.behaviours.*;
@@ -16,6 +19,7 @@ import org.jgrapht.alg.util.Pair;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import utils.ServiceUtils;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -52,7 +56,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         }
 
 
-        System.out.println(myAgent.getLocalName() + ": Path: " + GraphUtils.printPath(graph, path));
+        System.out.printf("%s: Path: %s (Cost: %.02f)\n", myAgent.getLocalName(), path.getVertexList(), path.getWeight());
 
         this.registerFirstState(new EvaluatePath(), STATE_EVAL);
         this.registerLastState(new Destination(), STATE_DST);
@@ -76,23 +80,6 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         this.registerTransition(STATE_TRC, STATE_TRC, EVENT_CAR);
         this.registerTransition(STATE_TRC, STATE_EVAL, EVENT_DEF);
         this.registerTransition(STATE_TRC, STATE_DST, EVENT_DST);
-    }
-
-    private Pair<ACLMessage, Integer> prepareCNIMessage(String service) {
-        // Initiate ContractNet
-        ACLMessage msg = new ACLMessage(ACLMessage.CFP);
-        msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
-        // Deadline is 10s after message is sent
-        msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
-        msg.setContent("dummy-action");
-
-        // procurar malta que está a procura de carro
-        DFAgentDescription[] agents = ServiceUtils.search(myAgent, service);
-
-        Arrays.stream(agents)
-                .forEach(agent -> msg.addReceiver(agent.getName()));
-
-        return Pair.of(msg, agents.length);
     }
 
     private MessageTemplate prepareCNRTemplate() {
@@ -127,10 +114,14 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         }
     }
 
-    static class Destination extends OneShotBehaviour {
+    class Destination extends OneShotBehaviour {
         @Override
         public void action() {
-            System.out.println(myAgent.getLocalName() + ": Completed path!");
+            double actualCost = GraphUtils.calculateCost(graph, path);
+            System.out.printf("%s: Completed Path! Cost: %.02f (before: %.02f)\n", myAgent.getLocalName(), actualCost, path.getWeight());
+            if (path.getWeight() != actualCost) {
+                System.out.printf("%s: Shared Road Segment!\n", myAgent.getLocalName());
+            }
         }
     }
 
@@ -201,6 +192,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         private MessageTemplate messageTemplate;
         private Pair<String, Boolean> done = Pair.of("done", false);
         private boolean busy = false;
+        private int attempts = 0;
 
         public CNRHelper(Agent a) {
             super(a);
@@ -218,17 +210,34 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         public int onEnd() {
             busy = false;
             done.setSecond(false);
+            attempts = 0;
             return super.onEnd();
         }
 
         @Override
         public void action() {
             if (!busy) {
+                block(1000);
                 ACLMessage cfp = myAgent.receive(messageTemplate);
                 if (cfp != null) {
-                    Behaviour behaviour = new CarShareContractNetResponder(myAgent, cfp, done);
-                    busy = true;
-                    myAgent.addBehaviour(behaviour);
+                    try {
+                        Point p1 = path.getVertexList().get(currentLocationIndex);
+                        Point p2 = GraphUtils.roadStop(graph, path, currentLocationIndex);
+
+                        GraphPath<Point, DefaultWeightedEdge> roadPath = GraphUtils.getPathFromAtoB(graph, p1.getName(), p2.getName());
+
+                        Behaviour behaviour = new CarShareContractNetResponder(myAgent, cfp, done, roadPath, graph);
+                        busy = true;
+                        myAgent.addBehaviour(behaviour);
+                    } catch (NoRoadsException e) {
+                        done.setSecond(Boolean.TRUE);
+                    }
+                } else {
+                    attempts++;
+                    if (attempts >= 10) {
+                        System.out.printf("%s: Max Attempts Reached!\n", myAgent.getLocalName());
+                        done.setSecond(Boolean.TRUE);
+                    }
                 }
             }
         }
@@ -259,11 +268,31 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         @Override
         public void action() {
             if (!busy) {
-                Pair<ACLMessage, Integer> cfpLengthPair = prepareCNIMessage(this.service);
+                ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
+                cfp.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+                // Deadline is 10s after message is sent
+                cfp.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+                cfp.setContent("dummy-action");
 
-                Behaviour behaviour = new CarShareContractNetInitiator(myAgent, cfpLengthPair.getFirst(), cfpLengthPair.getSecond(), done);
-                busy = true;
-                myAgent.addBehaviour(behaviour);
+                // procurar malta que está a procura de carro
+                DFAgentDescription[] agents = ServiceUtils.search(myAgent, service);
+
+                Arrays.stream(agents)
+                        .forEach(agent -> cfp.addReceiver(agent.getName()));
+
+                try {
+                    Point p1 = path.getVertexList().get(currentLocationIndex);
+                    Point p2 = GraphUtils.roadStop(graph, path, currentLocationIndex);
+                    GraphPath<Point, DefaultWeightedEdge> roadPath = GraphUtils.getPathFromAtoB(graph, p1.getName(), p2.getName());
+
+                    cfp.setContentObject(new RoadPathPoints(p1.getName(), p2.getName()));
+
+                    Behaviour behaviour = new CarShareContractNetInitiator(myAgent, cfp, agents.length, done, roadPath, graph);
+                    busy = true;
+                    myAgent.addBehaviour(behaviour);
+                } catch (NoRoadsException | IOException e) {
+                    done.setSecond(Boolean.TRUE);
+                }
             }
         }
     }
