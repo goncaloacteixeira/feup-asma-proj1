@@ -1,6 +1,6 @@
-package graph;
+package graph.edge;
 
-import org.jgrapht.graph.DefaultWeightedEdge;
+import graph.Colorable;
 
 public class RoadEdge extends Edge {
     @Override
@@ -9,7 +9,12 @@ public class RoadEdge extends Edge {
     }
 
     @Override
-    String getType() {
+    public String getType() {
         return "road";
+    }
+
+    @Override
+    public String getColor() {
+        return Colorable.ROAD_COLOR;
     }
 }

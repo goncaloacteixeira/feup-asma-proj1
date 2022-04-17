@@ -1,8 +1,11 @@
-package graph;
+package graph.vertex;
 
+import graph.Colorable;
+
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Point {
+public class Point implements Colorable {
     private String name;
 
     public Point(String name) {
@@ -44,5 +47,14 @@ public class Point {
                 return super.toString();
             }
         };
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getColor() {
+        return Colorable.STREET_COLOR;
     }
 }

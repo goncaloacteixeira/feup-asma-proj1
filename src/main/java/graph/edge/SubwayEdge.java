@@ -1,6 +1,6 @@
-package graph;
+package graph.edge;
 
-import org.jgrapht.graph.DefaultWeightedEdge;
+import graph.Colorable;
 
 public class SubwayEdge extends Edge {
     @Override
@@ -9,7 +9,12 @@ public class SubwayEdge extends Edge {
     }
 
     @Override
-    String getType() {
+    public String getType() {
         return "subway";
+    }
+
+    @Override
+    public String getColor() {
+        return Colorable.SUBWAY_COLOR;
     }
 }
