@@ -1,7 +1,7 @@
 package agents;
 
 import behaviours.BroadcastBehaviour;
-import behaviours.FSMHumanBehaviour;
+import behaviours.human.FSMHumanBehaviour;
 import graph.GraphUtils;
 import graph.vertex.Point;
 import jade.core.Agent;

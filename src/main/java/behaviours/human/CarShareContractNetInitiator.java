@@ -1,4 +1,4 @@
-package behaviours;
+package behaviours.human;
 
 import graph.vertex.Point;
 import jade.core.AID;
