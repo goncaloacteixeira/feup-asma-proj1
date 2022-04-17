@@ -191,24 +191,6 @@ public class GraphUtils {
         ByteArrayInputStream bais = new ByteArrayInputStream(graphString.getBytes(StandardCharsets.UTF_8));
         System.out.println("graph after deserialization: " + getFromDOT(bais));
 
-        // Serialize Deserialize Wrapper
-        GraphPointWrapper wrapper = new GraphPointWrapper(graphString, "sem1", "sem2");
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(os);
-        oos.writeObject(wrapper);
-        os.close();
-        oos.close();
-
-        byte[] bytes = os.toByteArray();
-
-        ByteArrayInputStream is = new ByteArrayInputStream(bytes);
-        ObjectInputStream ois = new ObjectInputStream(is);
-        GraphPointWrapper graphPointWrapper = (GraphPointWrapper) ois.readObject();
-        is.close();
-        ois.close();
-
-        System.out.println("After deserialization wrapper: " + graphPointWrapper.getGraph());
-
 
         // example for a graph without roads (road weight too high)
         graph = importGraph("citygraph.dot", 0, Integer.MAX_VALUE, 0);
