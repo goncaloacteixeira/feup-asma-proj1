@@ -25,8 +25,8 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class CityGraph {
-    private CityGraph() {}
+public class GraphUtils {
+    private GraphUtils() {}
 
     public static void exportToDOT(OutputStream outputStream, Graph<Point, DefaultWeightedEdge> g) {
         DOTExporter<Point, DefaultWeightedEdge> export = new DOTExporter<>();
@@ -112,7 +112,7 @@ public class CityGraph {
      * @return  a graph with custom weights
      */
     public static Graph<Point, DefaultWeightedEdge> importGraph(String filename, int streetWeight, int roadWeight, int subwayWeight) throws FileNotFoundException {
-        Graph<Point, DefaultWeightedEdge> graph = CityGraph.getFromDOT(new FileInputStream(new File(filename)));
+        Graph<Point, DefaultWeightedEdge> graph = GraphUtils.getFromDOT(new FileInputStream(new File(filename)));
         for (DefaultWeightedEdge edge : graph.edgeSet()) {
             if (edge instanceof StreetEdge && streetWeight > 0)
                 graph.setEdgeWeight(edge, streetWeight);
@@ -125,7 +125,7 @@ public class CityGraph {
     }
 
     public static Graph<Point, DefaultWeightedEdge> importGraph(String filename) throws FileNotFoundException {
-        return CityGraph.getFromDOT(new FileInputStream(new File(filename)));
+        return GraphUtils.getFromDOT(new FileInputStream(new File(filename)));
     }
 
     public static String printPath(Graph<Point, DefaultWeightedEdge> graph, GraphPath<Point, DefaultWeightedEdge> path) {

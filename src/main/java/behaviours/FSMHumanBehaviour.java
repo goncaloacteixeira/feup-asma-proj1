@@ -1,15 +1,11 @@
 package behaviours;
 
-import agents.HumanAgent;
-import graph.CityGraph;
+import graph.GraphUtils;
 import graph.edge.Edge;
 import graph.edge.RoadEdge;
 import graph.vertex.Point;
 import jade.core.Agent;
-import jade.core.AgentDescriptor;
-import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.FSMBehaviour;
-import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.*;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
@@ -39,15 +35,24 @@ public class FSMHumanBehaviour extends FSMBehaviour {
     static int EVENT_RESPOND = 4;
 
     private int currentLocationIndex = 0;
-    private Graph<Point, DefaultWeightedEdge> graph;
-    private GraphPath<Point, DefaultWeightedEdge> path;
+    protected Graph<Point, DefaultWeightedEdge> graph;
+    protected GraphPath<Point, DefaultWeightedEdge> path;
+    protected boolean initiator;
 
-    public FSMHumanBehaviour(Agent a, Graph<Point, DefaultWeightedEdge> graph, String src, String dst) {
+    public FSMHumanBehaviour(Agent a, Graph<Point, DefaultWeightedEdge> graph, String src, String dst, boolean initiator) {
         super(a);
         this.graph = graph;
-        this.path = CityGraph.getPathFromAtoB(graph, src, dst);
+        this.path = GraphUtils.getPathFromAtoB(graph, src, dst);
+        this.initiator = initiator;
 
-        System.out.println(myAgent.getLocalName() + ": Path: " + CityGraph.printPath(graph, path));
+        if (initiator) {
+            ServiceUtils.register(myAgent, "car-share-initiators");
+        } else {
+            ServiceUtils.register(myAgent, "car-share-responders");
+        }
+
+
+        System.out.println(myAgent.getLocalName() + ": Path: " + GraphUtils.printPath(graph, path));
 
         this.registerFirstState(new EvaluatePath(), STATE_EVAL);
         this.registerLastState(new Destination(), STATE_DST);
@@ -55,8 +60,8 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         this.registerState(new TravelDefault(), STATE_TRD);
         this.registerState(new StartCarShare(), STATE_CAR);
         this.registerState(new TravelCar(), STATE_TRC);
-        this.registerState(new CarShareContractNetInitiator(myAgent, prepareCNIMessage(), ServiceUtils.search(myAgent, "car-share-responders").length), STATE_CNI);
-        this.registerState(new CarShareContractNetResponder(myAgent, prepareCNRMessage()), STATE_CNR);
+        this.registerState(new CNIHelper(myAgent, "car-share-responders"), STATE_CNI);
+        this.registerState(new CNRHelper(myAgent), STATE_CNR);
 
         this.registerTransition(STATE_EVAL, STATE_CAR, EVENT_CAR);
         this.registerTransition(STATE_EVAL, STATE_DST, EVENT_DST);
@@ -73,7 +78,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         this.registerTransition(STATE_TRC, STATE_DST, EVENT_DST);
     }
 
-    private ACLMessage prepareCNIMessage() {
+    private Pair<ACLMessage, Integer> prepareCNIMessage(String service) {
         // Initiate ContractNet
         ACLMessage msg = new ACLMessage(ACLMessage.CFP);
         msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
@@ -82,17 +87,16 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         msg.setContent("dummy-action");
 
         // procurar malta que está a procura de carro
-        DFAgentDescription[] agents = ServiceUtils.search(myAgent, "car-share-responders");
+        DFAgentDescription[] agents = ServiceUtils.search(myAgent, service);
 
         Arrays.stream(agents)
                 .forEach(agent -> msg.addReceiver(agent.getName()));
 
-        return msg;
+        return Pair.of(msg, agents.length);
     }
 
-    private MessageTemplate prepareCNRMessage() {
+    private MessageTemplate prepareCNRTemplate() {
         // Respond to ContractNet
-        System.out.println("Agent " + myAgent.getLocalName() + " waiting for CFP...");
         return MessageTemplate.and(
                 MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET),
                 MessageTemplate.MatchPerformative(ACLMessage.CFP));
@@ -140,7 +144,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
             String msg = String.format("Moving from [%s] to [%s] by %s", pt1, pt2, edge);
 
             System.out.println(myAgent.getLocalName() + ":" + msg);
-            ((HumanAgent) myAgent).informMovement(msg);
+            // ((HumanAgent) myAgent).informMovement(msg);
         }
     }
 
@@ -156,7 +160,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
             String msg = String.format("Moving from [%s] to [%s] by %s", pt1, pt2, edge);
 
             System.out.println(myAgent.getLocalName() + ":" + msg);
-            ((HumanAgent) myAgent).informMovement(msg);
+            // ((HumanAgent) myAgent).informMovement(msg);
 
             if (currentLocationIndex == path.getLength()) {
                 exitValue = FSMHumanBehaviour.EVENT_DST;
@@ -178,21 +182,13 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         }
     }
 
-    static class StartCarShare extends OneShotBehaviour {
+    class StartCarShare extends OneShotBehaviour {
         private int exitValue;
+
         @Override
         public void action() {
             System.out.println(myAgent.getLocalName() + ": Start Car Share...");
-
-            // Agent Wants a Ride, but it needs to see if there are initiators available
-            if (ServiceUtils.search(myAgent, "car-share-responders").length > 0) {
-                ServiceUtils.register(myAgent, "car-share-initiators");
-                exitValue = FSMHumanBehaviour.EVENT_INITIATE;
-            }
-            else {
-                ServiceUtils.register(myAgent, "car-share-responders");
-                exitValue = FSMHumanBehaviour.EVENT_RESPOND;
-            }
+            exitValue = initiator ? FSMHumanBehaviour.EVENT_INITIATE : FSMHumanBehaviour.EVENT_RESPOND;
         }
 
         @Override
@@ -200,4 +196,77 @@ public class FSMHumanBehaviour extends FSMBehaviour {
             return exitValue;
         }
     }
+
+    class CNRHelper extends Behaviour {
+        private MessageTemplate messageTemplate;
+        private Pair<String, Boolean> done = Pair.of("done", false);
+        private boolean busy = false;
+
+        public CNRHelper(Agent a) {
+            super(a);
+            this.messageTemplate = MessageTemplate.and(
+                    MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET),
+                    MessageTemplate.MatchPerformative(ACLMessage.CFP));
+        }
+
+        @Override
+        public boolean done() {
+            return done.getSecond();
+        }
+
+        @Override
+        public int onEnd() {
+            busy = false;
+            done.setSecond(false);
+            return super.onEnd();
+        }
+
+        @Override
+        public void action() {
+            if (!busy) {
+                ACLMessage cfp = myAgent.receive(messageTemplate);
+                if (cfp != null) {
+                    Behaviour behaviour = new CarShareContractNetResponder(myAgent, cfp, done);
+                    busy = true;
+                    myAgent.addBehaviour(behaviour);
+                }
+            }
+        }
+    }
+
+    class CNIHelper extends Behaviour {
+        private String service;
+        private Pair<String, Boolean> done = Pair.of("done", false);
+        private boolean busy = false;
+
+        public CNIHelper(Agent a, String service) {
+            super(a);
+            this.service = service;
+        }
+
+        @Override
+        public boolean done() {
+            return done.getSecond();
+        }
+
+        @Override
+        public int onEnd() {
+            busy = false;
+            done.setSecond(false);
+            return super.onEnd();
+        }
+
+        @Override
+        public void action() {
+            if (!busy) {
+                Pair<ACLMessage, Integer> cfpLengthPair = prepareCNIMessage(this.service);
+
+                Behaviour behaviour = new CarShareContractNetInitiator(myAgent, cfpLengthPair.getFirst(), cfpLengthPair.getSecond(), done);
+                busy = true;
+                myAgent.addBehaviour(behaviour);
+            }
+        }
+    }
+
+
 }

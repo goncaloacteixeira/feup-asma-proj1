@@ -6,6 +6,7 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.proto.ContractNetInitiator;
+import org.jgrapht.alg.util.Pair;
 import utils.ServiceUtils;
 
 import java.util.Arrays;
@@ -15,12 +16,14 @@ import java.util.Vector;
 import java.util.function.Function;
 
 public class CarShareContractNetInitiator extends ContractNetInitiator {
+    private final Pair<String, Boolean> done;
     private int nResponders;
+    private String service;
 
-    public CarShareContractNetInitiator(Agent a, ACLMessage cfp, int nResponders) {
+    public CarShareContractNetInitiator(Agent a, ACLMessage cfp, int nResponders, Pair<String, Boolean> done) {
         super(a, cfp);
-
         this.nResponders = nResponders;
+        this.done = done;
     }
 
     protected void handlePropose(ACLMessage propose, Vector v) {
@@ -80,8 +83,8 @@ public class CarShareContractNetInitiator extends ContractNetInitiator {
 
     @Override
     public int onEnd() {
-        System.out.println(myAgent.getLocalName() + ": onEnd()");
-        ServiceUtils.deregister(myAgent);
+        reset();
+        this.done.setSecond(Boolean.TRUE);
         return 0;
     }
 }

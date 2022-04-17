@@ -32,6 +32,6 @@ public class GraphPointWrapper implements Serializable {
     }
 
     public Graph<Point, DefaultWeightedEdge> getGraph() {
-        return CityGraph.getFromDOT(new ByteArrayInputStream(dotGraph.getBytes(StandardCharsets.UTF_8)));
+        return GraphUtils.getFromDOT(new ByteArrayInputStream(dotGraph.getBytes(StandardCharsets.UTF_8)));
     }
 }

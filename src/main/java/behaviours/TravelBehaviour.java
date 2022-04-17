@@ -1,7 +1,7 @@
 package behaviours;
 
 import agents.HumanAgent;
-import graph.CityGraph;
+import graph.GraphUtils;
 import graph.edge.Edge;
 import graph.vertex.Point;
 import jade.core.behaviours.Behaviour;
@@ -18,8 +18,8 @@ public class TravelBehaviour extends Behaviour {
     public TravelBehaviour(HumanAgent a, Graph<Point, DefaultWeightedEdge> graph, String srcPoint, String dstPoint) {
         super(a);
         this.graph = graph;
-        this.path = CityGraph.getPathFromAtoB(graph, srcPoint, dstPoint);
-        System.out.println(myAgent.getLocalName() + ": Path is: " + CityGraph.printPath(graph, path));
+        this.path = GraphUtils.getPathFromAtoB(graph, srcPoint, dstPoint);
+        System.out.println(myAgent.getLocalName() + ": Path is: " + GraphUtils.printPath(graph, path));
     }
 
     @Override

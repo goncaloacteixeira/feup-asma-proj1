@@ -1,17 +1,26 @@
 package behaviours;
 
 import jade.core.Agent;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.ContractNetResponder;
+import jade.proto.SSContractNetResponder;
+import jade.proto.SSIteratedContractNetResponder;
+import org.jgrapht.alg.util.Pair;
 import utils.ServiceUtils;
 
-public class CarShareContractNetResponder extends ContractNetResponder {
-    public CarShareContractNetResponder(Agent a, MessageTemplate mt) {
-        super(a, mt);
+import java.util.Map;
+
+public class CarShareContractNetResponder extends SSContractNetResponder {
+    private Pair<String, Boolean> done;
+
+    public CarShareContractNetResponder(Agent a, ACLMessage cfp, Pair<String, Boolean> done) {
+        super(a, cfp);
+        this.done = done;
     }
 
     @Override
@@ -35,15 +44,12 @@ public class CarShareContractNetResponder extends ContractNetResponder {
     @Override
     protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) throws FailureException {
         System.out.println("Agent " + myAgent.getLocalName() + ": Proposal accepted");
-        if (performAction()) {
-            System.out.println("Agent " + myAgent.getLocalName() + ": Action successfully performed");
-            ACLMessage inform = accept.createReply();
-            inform.setPerformative(ACLMessage.INFORM);
-            return inform;
-        } else {
-            System.out.println("Agent " + myAgent.getLocalName() + ": Action execution failed");
-            throw new FailureException("unexpected-error");
-        }
+
+        System.out.println("Agent " + myAgent.getLocalName() + ": Action successfully performed");
+        ACLMessage inform = accept.createReply();
+        inform.setPerformative(ACLMessage.INFORM);
+        inform.setContent("done");
+        return inform;
     }
 
     protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject) {
@@ -60,9 +66,10 @@ public class CarShareContractNetResponder extends ContractNetResponder {
         return (Math.random() > 0.2);
     }
 
-    @Override
+
     public int onEnd() {
-        System.out.println(myAgent.getLocalName() + ": onEnd()");
-        return 0;
+        this.done.setSecond(Boolean.TRUE);
+        reset();
+        return super.onEnd();
     }
 }
