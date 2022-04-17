@@ -3,26 +3,18 @@ package behaviours;
 import graph.RoadPathPoints;
 import graph.vertex.Point;
 import jade.core.Agent;
-import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-import jade.proto.ContractNetResponder;
 import jade.proto.SSContractNetResponder;
-import jade.proto.SSIteratedContractNetResponder;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.util.Pair;
 import org.jgrapht.graph.DefaultWeightedEdge;
-import utils.ServiceUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 public class CarShareContractNetResponder extends SSContractNetResponder {
@@ -54,7 +46,7 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
             return refusal;
         }
 
-        double proposal = new Random().nextGaussian(0.4, 0.15);
+        double proposal = new Random().nextGaussian();
         System.out.printf("%s: Proposing: %.02f\n", myAgent.getLocalName(), proposal);
 
         ACLMessage propose = cfp.createReply();

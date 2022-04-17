@@ -21,12 +21,12 @@ import org.jgrapht.nio.dot.DOTImporter;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class GraphUtils {
+
+    private static final String DEFAULT_GRAPH_FILENAME = "citygraph.dot";
+
     private GraphUtils() {}
 
     public static void exportToDOT(OutputStream outputStream, Graph<Point, DefaultWeightedEdge> g) {
@@ -129,6 +129,10 @@ public class GraphUtils {
         return GraphUtils.getFromDOT(new FileInputStream(filename));
     }
 
+    public static Graph<Point, DefaultWeightedEdge> importDefaultGraph() throws FileNotFoundException {
+        return GraphUtils.importGraph(GraphUtils.DEFAULT_GRAPH_FILENAME);
+    }
+
     public static String printPath(Graph<Point, DefaultWeightedEdge> graph, GraphPath<Point, DefaultWeightedEdge> path) {
         StringBuilder result = new StringBuilder();
         for (DefaultWeightedEdge edge : path.getEdgeList()) {
@@ -216,5 +220,15 @@ public class GraphUtils {
         System.out.println(printPath(graph, path));
         // this will raise an exception
         // System.out.println("Road Stop:" + roadStop(graph, path));
+    }
+
+    public static Set<Semaphore> getSemaphores(Graph<Point, DefaultWeightedEdge> graph) {
+        Set<Semaphore> semaphores = new HashSet<>();
+        for (Point point : graph.vertexSet()) {
+            if (point instanceof Semaphore) {
+                semaphores.add((Semaphore) point);
+            }
+        }
+        return semaphores;
     }
 }

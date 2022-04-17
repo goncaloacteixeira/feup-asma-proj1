@@ -7,11 +7,16 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 
 public interface ServiceUtils {
 
+    String HUMAN_BROADCAST = "human-broadcast-service";
+
+    String CAR = "car-service";
+
     /**
      * Registers the agent in a DF service.
-     * @param agent          The agent to register.
-     * @param serviceName    The name of the service.
-     * @return               True if the agent was registered successfully.
+     *
+     * @param agent       The agent to register.
+     * @param serviceName The name of the service.
+     * @return True if the agent was registered successfully.
      */
     static boolean register(Agent agent, String serviceName) {
         DFAgentDescription dfd = new DFAgentDescription();

@@ -1,15 +1,17 @@
-import agents.*;
+import agents.BillboardAgent;
+import agents.CarAgent;
+import agents.HumanAgent;
 import graph.GraphUtils;
 import graph.vertex.Point;
-import jade.Boot;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
-import org.jgrapht.Graph;
+import utils.ServiceUtils;
 
+import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,32 +37,50 @@ public class Launcher {
 
     private static void launchAgents(ContainerController container) {
         try {
-            // AgentController ac = container.createNewAgent("agente bue fixe", "agents.HelloWorldAgent", null);
-            AgentController billboardController = container.createNewAgent("Billboard", "agents.BillboardAgent", new Object[]{"human-broadcast-service"});
+            AgentController billboardController = container.createNewAgent("Billboard", BillboardAgent.class.getName(), new Object[]{ServiceUtils.HUMAN_BROADCAST});
             billboardController.start();
             Thread.sleep(1000); // time to initialize
 
-            List<Point> points = new java.util.ArrayList<>(GraphUtils.importGraph("citygraph.dot").vertexSet().stream().toList());
-
-            Random random = new Random();
-            List<AgentController> agentControllers = new ArrayList<>();
-            for (int i = 1; i <= 2500; i++) {
-                Collections.shuffle(points);
-                byte[] p1 = points.get(0).getName().getBytes(StandardCharsets.UTF_8);
-                byte[] p2 = points.get(1).getName().getBytes(StandardCharsets.UTF_8);
-
-                boolean initiator = random.nextDouble() > 0.5;
-                AgentController ac = container.createNewAgent("Human" + i, HumanAgent.class.getName(), new Object[]{new String(p1, StandardCharsets.UTF_8), new String(p2, StandardCharsets.UTF_8), initiator});
-                agentControllers.add(ac);
-            }
-
-            for (AgentController agentController : agentControllers) {
-                agentController.start();
-            }
+            Launcher.launchHumans(container, 5);
+            Launcher.launchCars(container, 2, 4);
 
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
+        }
+    }
+
+    private static void launchHumans(ContainerController container, int amount) throws StaleProxyException, FileNotFoundException {
+        List<Point> points = new java.util.ArrayList<>(GraphUtils.importDefaultGraph().vertexSet().stream().toList());
+        List<AgentController> agentControllers = new ArrayList<>();
+
+        Random random = new Random();
+        for (int i = 1; i <= amount; i++) {
+            Collections.shuffle(points);
+            byte[] p1 = points.get(0).getName().getBytes(StandardCharsets.UTF_8);
+            byte[] p2 = points.get(1).getName().getBytes(StandardCharsets.UTF_8);
+
+            boolean initiator = random.nextDouble() > 0.5;
+            AgentController ac = container.createNewAgent("Human" + i, HumanAgent.class.getName(), new Object[]{new String(p1, StandardCharsets.UTF_8), new String(p2, StandardCharsets.UTF_8), initiator});
+            agentControllers.add(ac);
+        }
+
+        for (AgentController agentController : agentControllers) {
+            agentController.start();
+        }
+    }
+
+    private static void launchCars(ContainerController container, int amount, int carCapacity) throws StaleProxyException {
+        List<AgentController> agents = new ArrayList<>();
+
+        Random random = new Random();
+        for (int i = 1; i <= amount; i++) {
+            AgentController ac = container.createNewAgent("Car" + i, CarAgent.class.getName(), new Object[]{random.nextInt(carCapacity) + 1});
+            agents.add(ac);
+        }
+
+        for (AgentController agentController : agents) {
+            agentController.start();
         }
     }
 }

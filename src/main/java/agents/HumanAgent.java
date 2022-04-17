@@ -8,6 +8,7 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
+import utils.ServiceUtils;
 
 import java.io.FileNotFoundException;
 
@@ -19,7 +20,7 @@ public class HumanAgent extends Agent {
 
 
     public HumanAgent() {
-        this.broadcastService = "human-broadcast-service";
+        this.broadcastService = ServiceUtils.HUMAN_BROADCAST;
     }
 
     @Override
@@ -32,11 +33,10 @@ public class HumanAgent extends Agent {
         String broadcastMessage = String.format("I will go from %s to %s", srcPoint, dstPoint);
 
         try {
-            Graph<Point, DefaultWeightedEdge> graph = GraphUtils.importGraph("citygraph.dot");
+            Graph<Point, DefaultWeightedEdge> graph = GraphUtils.importDefaultGraph();
             addBehaviour(new BroadcastBehaviour(this, ACLMessage.INFORM, broadcastMessage, this.broadcastService));
 
             FSMHumanBehaviour humanBehaviour = new FSMHumanBehaviour(this, graph, srcPoint, dstPoint, initiator);
-
             addBehaviour(humanBehaviour);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
