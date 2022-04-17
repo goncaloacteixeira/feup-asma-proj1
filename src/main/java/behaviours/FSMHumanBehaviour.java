@@ -82,13 +82,6 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         this.registerTransition(STATE_TRC, STATE_DST, EVENT_DST);
     }
 
-    private MessageTemplate prepareCNRTemplate() {
-        // Respond to ContractNet
-        return MessageTemplate.and(
-                MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET),
-                MessageTemplate.MatchPerformative(ACLMessage.CFP));
-    }
-
     class EvaluatePath extends OneShotBehaviour {
         private int exitValue;
 
@@ -202,6 +195,19 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         }
 
         @Override
+        public void onStart() {
+            try {
+                Point p1 = path.getVertexList().get(currentLocationIndex);
+                Point p2 = GraphUtils.roadStop(graph, path, currentLocationIndex);
+                System.out.printf("%s: Requesting Car Share from %s to %s\n", myAgent.getLocalName(), p1, p2);
+            } catch (NoRoadsException e) {
+                throw new RuntimeException(e);
+            }
+
+            super.onStart();
+        }
+
+        @Override
         public boolean done() {
             return done.getSecond();
         }
@@ -254,6 +260,19 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         }
 
         @Override
+        public void onStart() {
+            try {
+                Point p1 = path.getVertexList().get(currentLocationIndex);
+                Point p2 = GraphUtils.roadStop(graph, path, currentLocationIndex);
+                System.out.printf("%s: Announcing Car Share from %s to %s\n", myAgent.getLocalName(), p1, p2);
+            } catch (NoRoadsException e) {
+                throw new RuntimeException(e);
+            }
+
+            super.onStart();
+        }
+
+        @Override
         public boolean done() {
             return done.getSecond();
         }
@@ -273,8 +292,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
                 // Deadline is 10s after message is sent
                 cfp.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
                 cfp.setContent("dummy-action");
-
-                // procurar malta que está a procura de carro
+                
                 DFAgentDescription[] agents = ServiceUtils.search(myAgent, service);
 
                 Arrays.stream(agents)
