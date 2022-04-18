@@ -1,4 +1,4 @@
-package behaviours;
+package behaviours.human;
 
 import graph.vertex.Point;
 import jade.core.AID;
@@ -59,7 +59,15 @@ public class CarShareContractNetInitiator extends ContractNetInitiator {
             // Some responder didn't reply within the specified timeout
             System.out.println("Timeout expired: missing " + (nResponders - responses.size()) + " responses");
         }
-        // Evaluate proposals.
+
+        /*
+         * Evaluate Proposal
+         * - threshold: max acceptable contributions from proposers
+         * - current: current contributions from proposers
+         *
+         * While the current does not reach threshold, we accept proposals.
+         * TODO - account for car capacity, add a new field to this class after uber find behaviour @marcio
+         */
         double current = 0.0;
         double threshold = 0.9;
         Enumeration e = responses.elements();
@@ -82,11 +90,15 @@ public class CarShareContractNetInitiator extends ContractNetInitiator {
     protected void handleInform(ACLMessage inform) {
         System.out.printf("%s: %s completed ContractNet\n", myAgent.getLocalName(), inform.getSender().getLocalName());
         try {
-            Double[] contribs = (Double[]) inform.getContentObject();
+            /*
+             * Decrement weight based on contributions. The INFORM message has a double[] containing the
+             * contributions from the proposer
+             */
+            Double[] contributions = (Double[]) inform.getContentObject();
             for (int i = 0; i < roadPath.getEdgeList().size(); i++) {
                 DefaultWeightedEdge e = roadPath.getEdgeList().get(i);
                 double weight = graph.getEdgeWeight(e);
-                graph.setEdgeWeight(e, weight - contribs[i]);
+                graph.setEdgeWeight(e, weight - contributions[i]);
             }
         } catch (UnreadableException e) {
             throw new RuntimeException(e);

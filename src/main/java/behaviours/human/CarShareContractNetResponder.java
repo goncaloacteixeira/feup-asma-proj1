@@ -1,4 +1,4 @@
-package behaviours;
+package behaviours.human;
 
 import graph.RoadPathPoints;
 import graph.vertex.Point;
@@ -17,10 +17,12 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import java.io.IOException;
 import java.util.Random;
 
+import static org.apache.commons.math3.util.Precision.round;
+
 public class CarShareContractNetResponder extends SSContractNetResponder {
     private final Graph<Point, DefaultWeightedEdge> graph;
-    private Pair<String, Boolean> done;
-    private GraphPath<Point, DefaultWeightedEdge> roadPath;
+    private final Pair<String, Boolean> done;
+    private final GraphPath<Point, DefaultWeightedEdge> roadPath;
 
     public CarShareContractNetResponder(Agent a, ACLMessage cfp, Pair<String, Boolean> done, GraphPath<Point, DefaultWeightedEdge> roadPath, Graph<Point, DefaultWeightedEdge> graph) {
         super(a, cfp);
@@ -46,7 +48,9 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
             return refusal;
         }
 
-        double proposal = new Random().nextGaussian();
+        double proposal = new Random().nextGaussian(0.4, 0.1);
+        proposal = round(proposal, 1);
+
         System.out.printf("%s: Proposing: %.02f\n", myAgent.getLocalName(), proposal);
 
         ACLMessage propose = cfp.createReply();
@@ -60,18 +64,22 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
         System.out.printf("%s: Proposal Accepted\n", myAgent.getLocalName());
         Double contrib = Double.valueOf(propose.getContent());
 
-        Double[] contribs = new Double[roadPath.getEdgeList().size()];
+        /*
+         * Contributions are calculated based on contrib value (0.5, 0.3, ...), then a contribution value is
+         * calculated based on the original edge weight, for the whole road path
+         */
+        Double[] contributions = new Double[roadPath.getEdgeList().size()];
         for (int i = 0; i < roadPath.getEdgeList().size(); i++) {
             DefaultWeightedEdge e = roadPath.getEdgeList().get(i);
             Double weight = graph.getEdgeWeight(e);
             graph.setEdgeWeight(e,  weight * contrib);
-            contribs[i] = weight * contrib;
+            contributions[i] = weight * contrib;
         }
 
         ACLMessage inform = accept.createReply();
         inform.setPerformative(ACLMessage.INFORM);
         try {
-            inform.setContentObject(contribs);
+            inform.setContentObject(contributions);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
