@@ -1,16 +1,14 @@
 import agents.*;
 import graph.GraphUtils;
 import graph.vertex.Point;
-import jade.Boot;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
-import org.jgrapht.Graph;
 
-import java.nio.charset.StandardCharsets;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,27 +38,41 @@ public class Launcher {
             billboardController.start();
             Thread.sleep(1000); // time to initialize
 
-            List<Point> points = new java.util.ArrayList<>(GraphUtils.importGraph("citygraph.dot").vertexSet().stream().toList());
-
-            Random random = new Random();
-            List<AgentController> agentControllers = new ArrayList<>();
-            for (int i = 1; i <= 2500; i++) {
-                Collections.shuffle(points);
-                byte[] p1 = points.get(0).getName().getBytes(StandardCharsets.UTF_8);
-                byte[] p2 = points.get(1).getName().getBytes(StandardCharsets.UTF_8);
-
-                boolean initiator = random.nextDouble() > 0.5;
-                AgentController ac = container.createNewAgent("Human" + i, HumanAgent.class.getName(), new Object[]{new String(p1, StandardCharsets.UTF_8), new String(p2, StandardCharsets.UTF_8), initiator});
-                agentControllers.add(ac);
-            }
-
-            for (AgentController agentController : agentControllers) {
-                agentController.start();
-            }
+            // generateMultipleRandomAgents(container);
+            generateTwoAgents(container);
 
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
+        }
+    }
+
+    private static void generateTwoAgents(ContainerController container) throws StaleProxyException {
+        HumanPreferences s1 = new HumanPreferences().carShareInitiator().noSubway();
+        HumanPreferences s2 = new HumanPreferences().noStreets();
+        AgentController ac1 = container.createNewAgent("Human1", HumanAgent.class.getName(), new Object[]{"sem1", "sta5", s1});
+        AgentController ac2 = container.createNewAgent("Human2", HumanAgent.class.getName(), new Object[]{"sem1", "sta5", s2});
+        ac1.start();
+        ac2.start();
+    }
+
+    private static void generateMultipleRandomAgents(ContainerController container) throws FileNotFoundException, StaleProxyException {
+        List<Point> points = new ArrayList<>(GraphUtils.importGraph("citygraph.dot").vertexSet().stream().toList());
+
+        Random random = new Random();
+        List<AgentController> agentControllers = new ArrayList<>();
+        for (int i = 1; i <= 10; i++) {
+            Collections.shuffle(points);
+            String p1 = points.get(0).getName();
+            String p2 = points.get(1).getName();
+
+            HumanPreferences settings = new HumanPreferences().carShareInitiator(random.nextDouble() > 0.5);
+            AgentController ac = container.createNewAgent("Human" + i, HumanAgent.class.getName(), new Object[]{p1, p2, settings});
+            agentControllers.add(ac);
+        }
+
+        for (AgentController agentController : agentControllers) {
+            agentController.start();
         }
     }
 }

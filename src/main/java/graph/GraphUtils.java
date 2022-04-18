@@ -29,6 +29,11 @@ import java.util.Random;
 public class GraphUtils {
     private GraphUtils() {}
 
+    /**
+     * Export a graph to DOT format with some attributes
+     * @param outputStream output for the DOT graph
+     * @param g original graph
+     */
     public static void exportToDOT(OutputStream outputStream, Graph<Point, DefaultWeightedEdge> g) {
         DOTExporter<Point, DefaultWeightedEdge> export = new DOTExporter<>();
         export.setVertexIdProvider(Point::toString);
@@ -50,6 +55,11 @@ public class GraphUtils {
         export.exportGraph(g, outputStream);
     }
 
+    /**
+     * Import a graph from a DOT format
+     * @param inputStream input for the graph object
+     * @return parsed graph
+     */
     public static Graph<Point, DefaultWeightedEdge> getFromDOT(InputStream inputStream) {
         DOTImporter<Point, DefaultWeightedEdge> importer = new DOTImporter<>();
         Graph<Point, DefaultWeightedEdge> g = new WeightedMultigraph<>(DefaultWeightedEdge.class);
@@ -91,6 +101,13 @@ public class GraphUtils {
         return g;
     }
 
+    /**
+     * Get the shortest path from A to B
+     * @param graph original graph
+     * @param a source point
+     * @param b destination point
+     * @return the shortest path from A to B
+     */
     public static GraphPath<Point, DefaultWeightedEdge> getPathFromAtoB(Graph<Point, DefaultWeightedEdge> graph, String a, String b) {
         DijkstraShortestPath<Point, DefaultWeightedEdge> dijkstraAlg = new DijkstraShortestPath<>(graph);
         ShortestPathAlgorithm.SingleSourcePaths<Point, DefaultWeightedEdge> iPaths = dijkstraAlg.getPaths(Point.instance(a));
@@ -112,7 +129,7 @@ public class GraphUtils {
      * @param subwayWeight  weight for subway edges
      * @return  a graph with custom weights
      */
-    public static Graph<Point, DefaultWeightedEdge> importGraph(String filename, int streetWeight, int roadWeight, int subwayWeight) throws FileNotFoundException {
+    public static Graph<Point, DefaultWeightedEdge> importGraph(String filename, double streetWeight, double roadWeight, double subwayWeight) throws FileNotFoundException {
         Graph<Point, DefaultWeightedEdge> graph = GraphUtils.getFromDOT(new FileInputStream(new File(filename)));
         for (DefaultWeightedEdge edge : graph.edgeSet()) {
             if (edge instanceof StreetEdge && streetWeight > 0)
@@ -125,10 +142,26 @@ public class GraphUtils {
         return graph;
     }
 
+    /**
+     * Import graph from a file
+     *
+     * @param filename file name containing a DOT format graph with required attributes
+     * @return parsed graph
+     * @throws FileNotFoundException when the file could not be found
+     */
     public static Graph<Point, DefaultWeightedEdge> importGraph(String filename) throws FileNotFoundException {
         return GraphUtils.getFromDOT(new FileInputStream(filename));
     }
 
+    /**
+     * @deprecated should not be using this method, have detected some memory leaks
+     *
+     * Method to get a Path in a pretty-printed format
+     * @param graph original graph
+     * @param path related path
+     * @return string containing the pretty-printed path
+     */
+    @Deprecated
     public static String printPath(Graph<Point, DefaultWeightedEdge> graph, GraphPath<Point, DefaultWeightedEdge> path) {
         StringBuilder result = new StringBuilder();
         for (DefaultWeightedEdge edge : path.getEdgeList()) {
@@ -142,13 +175,22 @@ public class GraphUtils {
     }
 
     /**
-     * !IMPORTANT!
+     * Method to calculate the final stop for a road segment, given the current location.
+     * <p>
+     * Example:
+     * <p>
+     * Path: A -R-> B -S-> C -R-> D -R-> E -R-> F -S-> G
+     * <p>
+     * Legend: R-Road S-Street <p>
+     * - for currentIndex = 1 -> throws <p>
+     * - for currentIndex = 2 -> F <p>
+     * - for currentIndex = 4 -> F <p>
      *
-     * GraphPath must start with a Semaphore Vertex!
-     *
-     * @param graph
-     * @param graphPath
-     * @return
+     * @param graph original graph
+     * @param graphPath path
+     * @param currentIndex current position - index for the point on the path
+     * @return the last point for the road segment
+     * @throws NoRoadsException when there's no road right ahead for the current position
      */
     public static Point roadStop(Graph<Point, DefaultWeightedEdge> graph, GraphPath<Point, DefaultWeightedEdge> graphPath, int currentIndex) throws NoRoadsException {
         if (currentIndex == graphPath.getLength()) {
@@ -165,56 +207,21 @@ public class GraphUtils {
         }
 
         if (stop == null) throw new NoRoadsException();
-
+        
         return stop;
     }
 
+    /**
+     * Calculate the actual cost for the path
+     * @param graph original graph
+     * @param path resulting path
+     * @return path cost
+     */
     public static double calculateCost(Graph<Point, DefaultWeightedEdge> graph, GraphPath<Point, DefaultWeightedEdge> path) {
         double cost = 0.0;
         for (DefaultWeightedEdge e : path.getEdgeList()) {
             cost += graph.getEdgeWeight(e);
         }
         return cost;
-    }
-
-    public static void main(String[] args) throws NoRoadsException, IOException, ClassNotFoundException {
-        Graph<Point, DefaultWeightedEdge> graph = importGraph("citygraph.dot");
-        GraphPath<Point, DefaultWeightedEdge> path = getPathFromAtoB(graph, "sem1", "sta3");
-        System.out.println(printPath(graph, path));
-
-        System.out.println("Road Stop:" + roadStop(graph, path, 1));
-
-        /* Example to Serialize and Deserialize */
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        exportToDOT(baos, graph);
-        String graphString = baos.toString(StandardCharsets.UTF_8);
-        ByteArrayInputStream bais = new ByteArrayInputStream(graphString.getBytes(StandardCharsets.UTF_8));
-        System.out.println("graph after deserialization: " + getFromDOT(bais));
-
-        // Serialize Deserialize Wrapper
-        GraphPointWrapper wrapper = new GraphPointWrapper(graphString, "sem1", "sem2");
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(os);
-        oos.writeObject(wrapper);
-        os.close();
-        oos.close();
-
-        byte[] bytes = os.toByteArray();
-
-        ByteArrayInputStream is = new ByteArrayInputStream(bytes);
-        ObjectInputStream ois = new ObjectInputStream(is);
-        GraphPointWrapper graphPointWrapper = (GraphPointWrapper) ois.readObject();
-        is.close();
-        ois.close();
-
-        System.out.println("After deserialization wrapper: " + graphPointWrapper.getGraph());
-
-
-        // example for a graph without roads (road weight too high)
-        graph = importGraph("citygraph.dot", 0, Integer.MAX_VALUE, 0);
-        path = getPathFromAtoB(graph, "sem1", "sta1");
-        System.out.println(printPath(graph, path));
-        // this will raise an exception
-        // System.out.println("Road Stop:" + roadStop(graph, path));
     }
 }
