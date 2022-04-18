@@ -17,6 +17,7 @@ import utils.ServiceUtils;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
 
 class CNIHelperBehaviour extends Behaviour {
     private final FSMHumanBehaviour fsmHumanBehaviour;
@@ -72,10 +73,9 @@ class CNIHelperBehaviour extends Behaviour {
             cfp.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
             cfp.setContent("dummy-action");
 
-            DFAgentDescription[] agents = ServiceUtils.search(myAgent, service);
+            Set<DFAgentDescription> agents = ServiceUtils.search(myAgent, service);
 
-            Arrays.stream(agents)
-                    .forEach(agent -> cfp.addReceiver(agent.getName()));
+            agents.forEach(agent -> cfp.addReceiver(agent.getName()));
 
             try {
                 Point p1 = fsmHumanBehaviour.path.getVertexList().get(fsmHumanBehaviour.currentLocationIndex);
@@ -84,7 +84,7 @@ class CNIHelperBehaviour extends Behaviour {
 
                 cfp.setContentObject(new RoadPathPoints(p1.getName(), p2.getName()));
 
-                Behaviour behaviour = new CarShareContractNetInitiator(myAgent, cfp, agents.length, done, roadPath, fsmHumanBehaviour.graph);
+                Behaviour behaviour = new CarShareContractNetInitiator(myAgent, cfp, agents.size(), done, roadPath, fsmHumanBehaviour.graph);
                 busy = true;
                 myAgent.addBehaviour(behaviour);
             } catch (NoRoadsException | IOException e) {

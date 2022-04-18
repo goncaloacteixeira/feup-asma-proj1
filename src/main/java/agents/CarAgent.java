@@ -1,24 +1,28 @@
 package agents;
 
-import behaviours.FSMCarBehaviour;
+import behaviours.car.CarFSMBehaviour;
 import graph.GraphUtils;
 import graph.vertex.Point;
+import graph.vertex.Semaphore;
 import jade.core.Agent;
+import lombok.Getter;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.io.FileNotFoundException;
+import java.util.Random;
+import java.util.Set;
 
 public class CarAgent extends Agent {
 
-    private String carName;
-
-    private int carNumber;
-
+    @Getter
     private int carCapacity;
 
-    public CarAgent() {
-    }
+    @Getter
+    private Graph<Point, DefaultWeightedEdge> graph;
+
+    @Getter
+    private Point currentLocation;
 
     @Override
     public void setup() {
@@ -26,11 +30,26 @@ public class CarAgent extends Agent {
 
         this.carCapacity = (int) args[0];
 
+        // gets the graph
         try {
-            Graph<Point, DefaultWeightedEdge> graph = GraphUtils.importDefaultGraph();
-            this.addBehaviour(new FSMCarBehaviour(this, graph));
+            this.graph = GraphUtils.importDefaultGraph();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            return;
         }
+
+        // generate random sem location
+        Set<Semaphore> semaphores = GraphUtils.getSemaphores(this.graph);
+        // get random from set
+        semaphores.stream().skip(new Random().nextInt(semaphores.size())).findFirst().ifPresent(semaphore -> {
+            this.currentLocation = semaphore;
+        });
+
+        this.addBehaviour(new CarFSMBehaviour(this, graph));
+    }
+
+    public void moveTo(Point point) {
+        // TODO verify if possible and adjacent
+        this.currentLocation = point;
     }
 }

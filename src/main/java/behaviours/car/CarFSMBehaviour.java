@@ -1,4 +1,4 @@
-package behaviours;
+package behaviours.car;
 
 import graph.GraphUtils;
 import graph.vertex.Point;
@@ -7,28 +7,31 @@ import jade.core.Agent;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import utils.ServiceUtils;
 
 import java.util.Set;
 
-public class FSMCarBehaviour extends FSMBehaviour {
+public class CarFSMBehaviour extends FSMBehaviour {
 
     public static String LISTENING_STATE = "LISTENING";
 
     private Point currentLocation;
 
-    public FSMCarBehaviour(Agent a, Graph<Point, DefaultWeightedEdge> graph) {
+    public CarFSMBehaviour(Agent a, Graph<Point, DefaultWeightedEdge> graph) {
         super(a);
 
         // choose current location from random in the graph
         Set<Semaphore> points = GraphUtils.getSemaphores(graph);
         // choose random point from set
         this.currentLocation = points.toArray(new Point[0])[(int) (Math.random() * points.size())];
+
+        this.registerStates();
     }
 
-    public FSMCarBehaviour(Agent a, Graph<Point, DefaultWeightedEdge> graph, Point initialLocation) {
+    public CarFSMBehaviour(Agent a, Graph<Point, DefaultWeightedEdge> graph, Point initialLocation) {
         super(a);
 
         this.currentLocation = initialLocation;
@@ -37,7 +40,9 @@ public class FSMCarBehaviour extends FSMBehaviour {
     }
 
     private void registerStates() {
-        this.registerFirstState(new ListeningState(), LISTENING_STATE);
+        // TODO
+//        this.registerFirstState(new ListeningState(), LISTENING_STATE);
+        this.myAgent.addBehaviour(new ListeningState());
     }
 
     class ListeningState extends OneShotBehaviour {
@@ -45,16 +50,10 @@ public class FSMCarBehaviour extends FSMBehaviour {
         @Override
         public void action() {
             // register in service
-            ServiceUtils.register(this.myAgent, ServiceUtils.CAR);
+            ServiceUtils.register(this.myAgent, ServiceUtils.CAR_RIDE);
+            System.out.println("Car " + this.myAgent.getLocalName() + " is listening");
 
-            // wait for messages
-            ACLMessage msg = this.myAgent.receive();
-
-            if (msg != null) {
-                System.out.printf("%s: %s%n", msg.getSender().getLocalName(), msg.getContent());
-            } else {
-                this.block();
-            }
+            this.myAgent.addBehaviour(new CarRideContractNetResponderBehaviour(this.myAgent, MessageTemplate.MatchPerformative(ACLMessage.CFP)));
         }
     }
 }

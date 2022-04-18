@@ -1,7 +1,4 @@
-import agents.BillboardAgent;
-import agents.CarAgent;
-import agents.HumanAgent;
-import agents.HumanPreferences;
+import agents.*;
 import graph.GraphUtils;
 import graph.vertex.Point;
 import jade.core.Profile;
@@ -83,8 +80,7 @@ public class Launcher {
         }
     }
 
-    private static void launchCars(ContainerController container, int amount, int carCapacity) throws
-            StaleProxyException {
+    private static void launchCars(ContainerController container, int amount, int carCapacity) throws StaleProxyException {
         List<AgentController> agents = new ArrayList<>();
 
         Random random = new Random();
@@ -96,5 +92,8 @@ public class Launcher {
         for (AgentController agentController : agents) {
             agentController.start();
         }
+
+        var test = container.createNewAgent("Test", DeleteMePleaseAgent.class.getName(), new Object[]{}); // FIXME
+        test.start();
     }
 }

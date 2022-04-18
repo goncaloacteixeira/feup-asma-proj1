@@ -7,6 +7,8 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
 import utils.ServiceUtils;
 
+import java.util.Set;
+
 public class BroadcastBehaviour extends Behaviour {
 
     private final int performative;
@@ -30,7 +32,7 @@ public class BroadcastBehaviour extends Behaviour {
     @Override
     public void action() {
         // gets all agents
-        DFAgentDescription[] agents = ServiceUtils.search(this.myAgent, this.serviceName);
+        Set<DFAgentDescription> agents = ServiceUtils.search(this.myAgent, this.serviceName);
 
         ACLMessage msg = new ACLMessage(this.performative);
         for (DFAgentDescription agent : agents) {
