@@ -1,10 +1,12 @@
 package behaviours.car;
 
+import behaviours.human.AskCarRideBehaviour;
 import graph.vertex.Point;
 import jade.core.Agent;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
 import jade.proto.ContractNetInitiator;
+import jdk.swing.interop.SwingInterOpUtils;
 import messages.CarRideCFPMessage;
 import utils.ServiceUtils;
 
@@ -18,16 +20,18 @@ public class CarRideContractNetInitiatorBehaviour extends ContractNetInitiator {
 
     private final Point end;
 
-    public CarRideContractNetInitiatorBehaviour(Agent a, ACLMessage cfp, Point start, Point end) {
+    private final AskCarRideBehaviour askCarRideBehaviour;
+
+    public CarRideContractNetInitiatorBehaviour(AskCarRideBehaviour askCarRideBehaviour, Agent a, ACLMessage cfp, Point start, Point end) {
         super(a, cfp);
 
+        this.askCarRideBehaviour = askCarRideBehaviour;
         this.start = start;
         this.end = end;
     }
 
     @Override
     protected Vector<ACLMessage> prepareCfps(ACLMessage cfp) {
-        System.out.println("preparing CFPs");
         Vector<ACLMessage> v = new Vector<>();
 
         try {
@@ -39,7 +43,7 @@ public class CarRideContractNetInitiatorBehaviour extends ContractNetInitiator {
 
         // get available cars in service
         Set<DFAgentDescription> cars = ServiceUtils.search(this.myAgent, ServiceUtils.CAR_RIDE);
-        System.out.println("found " + cars.size() + " cars");
+        System.out.printf("%s: found %d cars in service\n", this.myAgent.getLocalName(), cars.size());
 
         cars.forEach(car -> {
             cfp.addReceiver(car.getName());
@@ -56,9 +60,16 @@ public class CarRideContractNetInitiatorBehaviour extends ContractNetInitiator {
         for (Object o : responses) {
             ACLMessage response = (ACLMessage) o;
             ACLMessage reply = response.createReply();
-            reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL); // or REJECT_PROPOSAL
-            acceptances.addElement(reply);
+            // if acceptances is empty
+            if (acceptances.isEmpty()) {
+                reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+            } else {
+                reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
+            }
+            acceptances.addElement(reply); //
         }
+
+        this.askCarRideBehaviour.setDone(true);
     }
 
     @Override

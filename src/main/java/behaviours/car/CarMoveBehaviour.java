@@ -3,8 +3,10 @@ package behaviours.car;
 import agents.CarAgent;
 import graph.GraphUtils;
 import graph.vertex.Point;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
+import jade.lang.acl.ACLMessage;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
@@ -14,16 +16,27 @@ public class CarMoveBehaviour extends Behaviour {
 
     private final CarAgent carAgent;
 
-    private final GraphPath<Point, DefaultWeightedEdge> path;
+    private final CarFSMBehaviour fsm;
+
+    private GraphPath<Point, DefaultWeightedEdge> path;
 
     private int currentPathIndex;
 
-    public CarMoveBehaviour(Agent a, Point moveTo) {
-        super(a);
+    private boolean done;
+
+    public CarMoveBehaviour(CarFSMBehaviour fsm) {
+        super(fsm.getAgent());
+
+        this.fsm = fsm;
 
         this.currentPathIndex = 0;
-        this.carAgent = (CarAgent) a;
-        this.path = GraphUtils.getPathFromAtoB(this.carAgent.getGraph(), this.carAgent.getCurrentLocation().getName(), moveTo.getName()); // TODO get only roads
+        this.carAgent = (CarAgent) fsm.getAgent();
+        this.done = false;
+    }
+
+    @Override
+    public void onStart() {
+        this.path = GraphUtils.getPathFromAtoB(this.carAgent.getGraph(), this.carAgent.getCurrentLocation().getName(), this.fsm.getCurrentDestination().getName()); // TODO get only roads
     }
 
     @Override
@@ -32,11 +45,19 @@ public class CarMoveBehaviour extends Behaviour {
             System.out.printf("%s: moving from [%s] to [%s]%n", this.carAgent.getLocalName(), this.path.getVertexList().get(this.currentPathIndex).getName(), this.path.getVertexList().get(this.currentPathIndex + 1).getName());
             this.currentPathIndex++;
             this.carAgent.moveTo(this.path.getVertexList().get(this.currentPathIndex));
+        } else {
+            System.out.println("arrrrrrrrrived at destination");
+            // send message to the human stating that the car has arrived
+            ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+            msg.addReceiver(this.fsm.getCurrentHuman());
+            msg.setContent("car_arrived"); // TODO const this shit
+            this.myAgent.send(msg);
+            this.done = true;
         }
     }
 
     @Override
     public boolean done() {
-        return this.currentPathIndex == this.path.getVertexList().size();
+        return this.done;
     }
 }

@@ -3,11 +3,14 @@ package behaviours.car;
 import graph.GraphUtils;
 import graph.vertex.Point;
 import graph.vertex.Semaphore;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import lombok.Getter;
+import lombok.Setter;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import utils.ServiceUtils;
@@ -16,9 +19,21 @@ import java.util.Set;
 
 public class CarFSMBehaviour extends FSMBehaviour {
 
-    public static String LISTENING_STATE = "LISTENING";
+    public static String STATE_LISTENING = "LISTENING";
+    public static String STATE_MOVING = "MOVING";
+    public static String STATE_END = "END";
+
+    public static int EVENT_PROPOSAL_ACCEPTED = 1;
+
+    @Getter
+    @Setter
+    private Point currentDestination;
 
     private Point currentLocation;
+
+    @Getter
+    @Setter
+    private AID currentHuman;
 
     public CarFSMBehaviour(Agent a, Graph<Point, DefaultWeightedEdge> graph) {
         super(a);
@@ -40,20 +55,14 @@ public class CarFSMBehaviour extends FSMBehaviour {
     }
 
     private void registerStates() {
-        // TODO
-//        this.registerFirstState(new ListeningState(), LISTENING_STATE);
-        this.myAgent.addBehaviour(new ListeningState());
-    }
+        this.registerFirstState(new CarListeningBehaviour(this.myAgent, this), STATE_LISTENING);
+        this.registerLastState(new CarEndBehaviour(), STATE_END);
 
-    class ListeningState extends OneShotBehaviour {
+        this.registerState(new CarMoveBehaviour(this), STATE_MOVING);
 
-        @Override
-        public void action() {
-            // register in service
-            ServiceUtils.register(this.myAgent, ServiceUtils.CAR_RIDE);
-            System.out.println("Car " + this.myAgent.getLocalName() + " is listening");
-
-            this.myAgent.addBehaviour(new CarRideContractNetResponderBehaviour(this.myAgent, MessageTemplate.MatchPerformative(ACLMessage.CFP)));
-        }
+        this.registerTransition(STATE_LISTENING, STATE_MOVING, EVENT_PROPOSAL_ACCEPTED);
+        this.registerDefaultTransition(STATE_LISTENING, STATE_END);
+        this.registerDefaultTransition(STATE_MOVING, STATE_END);
+        // TODO keep on the travel
     }
 }

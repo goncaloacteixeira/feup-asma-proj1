@@ -92,8 +92,5 @@ public class Launcher {
         for (AgentController agentController : agents) {
             agentController.start();
         }
-
-        var test = container.createNewAgent("Test", DeleteMePleaseAgent.class.getName(), new Object[]{}); // FIXME
-        test.start();
     }
 }
