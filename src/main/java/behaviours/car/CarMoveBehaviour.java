@@ -3,14 +3,10 @@ package behaviours.car;
 import agents.CarAgent;
 import graph.GraphUtils;
 import graph.vertex.Point;
-import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
-
-import java.util.List;
 
 public class CarMoveBehaviour extends Behaviour {
 
@@ -36,17 +32,23 @@ public class CarMoveBehaviour extends Behaviour {
 
     @Override
     public void onStart() {
-        this.path = GraphUtils.getPathFromAtoB(this.carAgent.getGraph(), this.carAgent.getCurrentLocation().getName(), this.fsm.getCurrentDestination().getName()); // TODO get only roads
+        // path until first of currentPath
+        this.path = GraphUtils.getPathFromAtoB(this.carAgent.getGraph(), this.carAgent.getCurrentLocation().getName(), this.fsm.getCurrentPath().getVertexList().get(0).getName());
+    }
+
+    @Override
+    public int onEnd() {
+        System.out.printf("%s: CarMoveBehaviour: onEnd()\n", this.carAgent.getLocalName());
+        this.reset();
+        return super.onEnd();
     }
 
     @Override
     public void action() {
         if (this.currentPathIndex < this.path.getVertexList().size() - 1) {
-            System.out.printf("%s: moving from [%s] to [%s]%n", this.carAgent.getLocalName(), this.path.getVertexList().get(this.currentPathIndex).getName(), this.path.getVertexList().get(this.currentPathIndex + 1).getName());
             this.currentPathIndex++;
             this.carAgent.moveTo(this.path.getVertexList().get(this.currentPathIndex));
         } else {
-            System.out.println("arrrrrrrrrived at destination");
             // send message to the human stating that the car has arrived
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(this.fsm.getCurrentHuman());
@@ -59,5 +61,11 @@ public class CarMoveBehaviour extends Behaviour {
     @Override
     public boolean done() {
         return this.done;
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        this.done = false;
     }
 }

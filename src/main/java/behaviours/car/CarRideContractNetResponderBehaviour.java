@@ -1,17 +1,18 @@
 package behaviours.car;
 
+import agents.CarAgent;
+import graph.GraphUtils;
 import graph.vertex.Point;
-import jade.core.Agent;
-import jade.core.behaviours.FSMBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 import jade.proto.ContractNetResponder;
 import messages.CarRideCFPMessage;
 import messages.CarRideProposeMessage;
+import org.jgrapht.GraphPath;
+import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.io.IOException;
-import java.util.Optional;
 
 public class CarRideContractNetResponderBehaviour extends ContractNetResponder {
 
@@ -19,7 +20,7 @@ public class CarRideContractNetResponderBehaviour extends ContractNetResponder {
 
     private final CarListeningBehaviour carListeningBehaviour;
 
-    private Point end;
+    private GraphPath<Point, DefaultWeightedEdge> path;
 
     public CarRideContractNetResponderBehaviour(CarListeningBehaviour carListeningBehaviour, CarFSMBehaviour fsm) {
         super(carListeningBehaviour.getAgent(), MessageTemplate.MatchPerformative(ACLMessage.CFP));
@@ -27,11 +28,12 @@ public class CarRideContractNetResponderBehaviour extends ContractNetResponder {
         this.carListeningBehaviour = carListeningBehaviour;
         this.fsm = fsm;
     }
+
     @Override
     protected ACLMessage handleCfp(ACLMessage cfp) {
         System.out.printf("%s: Received CFP from %s\n", myAgent.getLocalName(), cfp.getSender().getLocalName());
         // gets the message info
-        CarRideCFPMessage message = null;
+        CarRideCFPMessage message;
         try {
             message = (CarRideCFPMessage) cfp.getContentObject();
         } catch (UnreadableException e) {
@@ -41,7 +43,9 @@ public class CarRideContractNetResponderBehaviour extends ContractNetResponder {
 
         // gets the ride info
         Point start = message.getStart();
-        this.end = message.getEnd();
+        Point end = message.getEnd();
+
+        this.path = GraphUtils.getPathFromAtoB(((CarAgent) this.carListeningBehaviour.getAgent()).getGraph(), start.getName(), end.getName());
 
         // calculates metrics of the ride
 //        var currentPath = FIXME
@@ -70,7 +74,7 @@ public class CarRideContractNetResponderBehaviour extends ContractNetResponder {
 
     @Override
     protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
-        this.fsm.setCurrentDestination(this.end);
+        this.fsm.setCurrentPath(this.path);
         this.fsm.setCurrentHuman(accept.getSender());
 
         ACLMessage reply = accept.createReply();

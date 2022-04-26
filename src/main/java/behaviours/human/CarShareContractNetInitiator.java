@@ -24,7 +24,7 @@ public class CarShareContractNetInitiator extends ContractNetInitiator {
     private final Pair<String, Boolean> done;
     private final Graph<Point, DefaultWeightedEdge> graph;
     private int nResponders;
-    private GraphPath<Point, DefaultWeightedEdge> roadPath;
+    private final GraphPath<Point, DefaultWeightedEdge> roadPath;
 
     public CarShareContractNetInitiator(Agent a, ACLMessage cfp, int nResponders, Pair<String, Boolean> done, GraphPath<Point, DefaultWeightedEdge> roadPath, Graph<Point, DefaultWeightedEdge> graph) {
         super(a, cfp);

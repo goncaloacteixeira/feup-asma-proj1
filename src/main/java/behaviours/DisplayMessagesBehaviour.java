@@ -47,7 +47,7 @@ public class DisplayMessagesBehaviour extends Behaviour {
 
     public void stop() {
         this.done = true;
-        boolean unregistered = ServiceUtils.deregister(this.myAgent);
+        boolean unregistered = ServiceUtils.deregister(this.myAgent, this.service);
         if (!unregistered) {
             System.out.println("Could not unregister from service " + this.service);
         }

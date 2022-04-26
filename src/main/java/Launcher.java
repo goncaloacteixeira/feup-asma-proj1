@@ -1,4 +1,7 @@
-import agents.*;
+import agents.BillboardAgent;
+import agents.CarAgent;
+import agents.HumanAgent;
+import agents.HumanPreferences;
 import graph.GraphUtils;
 import graph.vertex.Point;
 import jade.core.Profile;
@@ -8,9 +11,6 @@ import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import utils.ServiceUtils;
-
-import java.io.FileNotFoundException;
-import java.nio.charset.StandardCharsets;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;

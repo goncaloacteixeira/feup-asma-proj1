@@ -39,7 +39,15 @@ public interface ServiceUtils {
         }
     }
 
-    static boolean deregister(Agent agent) {
+    static boolean deregister(Agent agent, String serviceName) {
+        DFAgentDescription dfd = new DFAgentDescription();
+        dfd.setName(agent.getAID());
+
+        ServiceDescription sd = new ServiceDescription();
+        sd.setType(serviceName);
+        sd.setName(agent.getLocalName() + "-" + serviceName);
+        dfd.addServices(sd);
+
         try {
             DFService.deregister(agent);
             return true;

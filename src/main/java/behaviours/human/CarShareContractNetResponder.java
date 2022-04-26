@@ -42,7 +42,7 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
         }
 
         // Only accept equal segment paths
-        if (!roadPath.getStartVertex().getName().equals(pathPoints.srcPoint) || !roadPath.getEndVertex().getName().equals(pathPoints.dstPoint)) {
+        if (!roadPath.getStartVertex().getName().equals(pathPoints.srcPoint()) || !roadPath.getEndVertex().getName().equals(pathPoints.dstPoint())) {
             ACLMessage refusal = cfp.createReply();
             refusal.setPerformative(ACLMessage.REFUSE);
             return refusal;

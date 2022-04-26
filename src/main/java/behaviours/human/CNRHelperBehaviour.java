@@ -15,8 +15,8 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 
 class CNRHelperBehaviour extends Behaviour {
     private final FSMHumanBehaviour fsmHumanBehaviour;
-    private MessageTemplate messageTemplate;
-    private Pair<String, Boolean> done = Pair.of("done", false);
+    private final MessageTemplate messageTemplate;
+    private final Pair<String, Boolean> done = Pair.of("done", false);
     private boolean busy = false;
     private int attempts = 0;
 

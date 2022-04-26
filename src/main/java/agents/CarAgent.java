@@ -45,11 +45,12 @@ public class CarAgent extends Agent {
             this.currentLocation = semaphore;
         });
 
-        this.addBehaviour(new CarFSMBehaviour(this, graph));
+        this.addBehaviour(new CarFSMBehaviour(this));
     }
 
     public void moveTo(Point point) {
         // TODO verify if possible and adjacent
+        System.out.printf("%s: moving from [%s] to [%s]%n", this.getLocalName(), this.currentLocation.getName(), point.getName());
         this.currentLocation = point;
     }
 }

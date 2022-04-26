@@ -1,15 +1,10 @@
 package graph;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 
-public class RoadPathPoints implements Serializable {
-    public final String srcPoint;
-    public final String dstPoint;
-
-    public RoadPathPoints(String srcPoint, String dstPoint) {
-        this.srcPoint = srcPoint;
-        this.dstPoint = dstPoint;
-    }
+public record RoadPathPoints(@Getter String srcPoint, @Getter String dstPoint) implements Serializable {
 
     @Override
     public String toString() {

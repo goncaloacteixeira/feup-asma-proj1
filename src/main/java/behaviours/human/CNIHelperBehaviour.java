@@ -4,7 +4,6 @@ import graph.GraphUtils;
 import graph.RoadPathPoints;
 import graph.exceptions.NoRoadsException;
 import graph.vertex.Point;
-import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPANames;
@@ -15,14 +14,13 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import utils.ServiceUtils;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
 
 class CNIHelperBehaviour extends Behaviour {
     private final FSMHumanBehaviour fsmHumanBehaviour;
-    private String service;
-    private Pair<String, Boolean> done = Pair.of("done", false);
+    private final String service;
+    private final Pair<String, Boolean> done = Pair.of("done", false);
     private boolean busy = false;
 
     /**

@@ -6,7 +6,6 @@ import jade.core.Agent;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
 import jade.proto.ContractNetInitiator;
-import jdk.swing.interop.SwingInterOpUtils;
 import messages.CarRideCFPMessage;
 import utils.ServiceUtils;
 
@@ -31,6 +30,12 @@ public class CarRideContractNetInitiatorBehaviour extends ContractNetInitiator {
     }
 
     @Override
+    public int onEnd() {
+        this.reset();
+        return super.onEnd();
+    }
+
+    @Override
     protected Vector<ACLMessage> prepareCfps(ACLMessage cfp) {
         Vector<ACLMessage> v = new Vector<>();
 
@@ -45,9 +50,7 @@ public class CarRideContractNetInitiatorBehaviour extends ContractNetInitiator {
         Set<DFAgentDescription> cars = ServiceUtils.search(this.myAgent, ServiceUtils.CAR_RIDE);
         System.out.printf("%s: found %d cars in service\n", this.myAgent.getLocalName(), cars.size());
 
-        cars.forEach(car -> {
-            cfp.addReceiver(car.getName());
-        });
+        cars.forEach(car -> cfp.addReceiver(car.getName()));
 
         v.addElement(cfp);
         return v;

@@ -1,9 +1,7 @@
 package agents;
 
 import behaviours.DisplayMessagesBehaviour;
-import behaviours.LaunchMessageBehaviour;
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
 
 /**
  * Rests in a service and waits for new messages. Then prints them.

@@ -2,13 +2,8 @@ package behaviours.car;
 
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.OneShotBehaviour;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 import lombok.Setter;
 import utils.ServiceUtils;
-
-import java.util.Optional;
 
 class CarListeningBehaviour extends Behaviour {
 
@@ -43,7 +38,16 @@ class CarListeningBehaviour extends Behaviour {
 
     @Override
     public int onEnd() {
-        System.out.println("fds");
+        ServiceUtils.deregister(this.myAgent, ServiceUtils.CAR_RIDE);
+        System.out.printf("%s: Not listening anymore\n", this.myAgent.getLocalName());
+
+        this.reset();
         return CarFSMBehaviour.EVENT_PROPOSAL_ACCEPTED;
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        this.done = false;
     }
 }
