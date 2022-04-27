@@ -50,6 +50,5 @@ public class CarFSMBehaviour extends FSMBehaviour {
         this.registerDefaultTransition(STATE_MOVING, STATE_TRANSPORTING);
         this.registerDefaultTransition(STATE_TRANSPORTING, STATE_END);
         this.registerTransition(STATE_TRANSPORTING, STATE_LISTENING, EVENT_TRAVEL_END);
-        // TODO keep on the travel
     }
 }

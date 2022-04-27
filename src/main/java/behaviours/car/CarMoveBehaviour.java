@@ -4,9 +4,14 @@ import agents.CarAgent;
 import graph.GraphUtils;
 import graph.vertex.Point;
 import jade.core.behaviours.Behaviour;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
+import messages.StringMessages;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
+import utils.ServiceUtils;
+
+import java.util.Set;
 
 public class CarMoveBehaviour extends Behaviour {
 
@@ -51,8 +56,10 @@ public class CarMoveBehaviour extends Behaviour {
         } else {
             // send message to the human stating that the car has arrived
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-            msg.addReceiver(this.fsm.getCurrentHuman());
-            msg.setContent("car_arrived"); // TODO const this shit
+            Set<DFAgentDescription> agents = ServiceUtils.search(this.carAgent, ServiceUtils.buildRideName(this.fsm.getCurrentHuman().getLocalName()));
+            // add all agents as receivers
+            agents.forEach(agent -> msg.addReceiver(agent.getName()));
+            msg.setContent(StringMessages.CAR_ARRIVED);
             this.myAgent.send(msg);
             this.done = true;
         }

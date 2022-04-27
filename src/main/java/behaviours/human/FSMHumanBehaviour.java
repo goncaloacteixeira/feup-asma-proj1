@@ -5,8 +5,7 @@ import agents.HumanPreferences;
 import graph.GraphUtils;
 import graph.edge.Edge;
 import graph.vertex.Point;
-import jade.core.Agent;
-import jade.core.behaviours.*;
+import jade.core.behaviours.FSMBehaviour;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -80,6 +79,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
 
     /**
      * Method to get string about traveling operations
+     *
      * @return travel information
      */
     public String informTravel() {

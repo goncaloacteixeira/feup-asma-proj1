@@ -13,6 +13,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.util.Pair;
 import org.jgrapht.graph.DefaultWeightedEdge;
+import utils.ServiceUtils;
 
 import java.io.IOException;
 import java.util.Random;
@@ -83,6 +84,8 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        // join the other agent ride service so that the car can communicate with both
+        ServiceUtils.register(this.myAgent, ServiceUtils.buildRideName(accept.getSender().getLocalName()));
         return inform;
     }
 

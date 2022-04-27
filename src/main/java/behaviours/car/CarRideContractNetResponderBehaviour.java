@@ -58,7 +58,7 @@ public class CarRideContractNetResponderBehaviour extends ContractNetResponder {
         ACLMessage reply = cfp.createReply();
         reply.setPerformative(ACLMessage.PROPOSE);
         try {
-            reply.setContentObject(new CarRideProposeMessage(price, distance, capacity));
+            reply.setContentObject(new CarRideProposeMessage(price, distance, capacity, this.myAgent.getName()));
         } catch (IOException e) {
             e.printStackTrace();
             return null;

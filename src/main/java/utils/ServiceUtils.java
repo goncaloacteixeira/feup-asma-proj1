@@ -72,4 +72,8 @@ public interface ServiceUtils {
 
         return new HashSet<>(0);
     }
+
+    static String buildRideName(String agentName) {
+        return agentName + "-" + "ride";
+    }
 }

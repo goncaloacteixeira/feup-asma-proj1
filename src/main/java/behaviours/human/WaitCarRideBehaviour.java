@@ -3,6 +3,7 @@ package behaviours.human;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
+import messages.StringMessages;
 
 /**
  * This behaviour is used to wait for a car to arrive.
@@ -25,7 +26,7 @@ public class WaitCarRideBehaviour extends Behaviour {
         if (msg != null) {
             // if message is inform
             if (msg.getPerformative() == ACLMessage.INFORM) {
-                if (msg.getContent() != null && msg.getContent().equals("car_arrived")) { // TODO arrived a const
+                if (msg.getContent() != null && msg.getContent().equals(StringMessages.CAR_ARRIVED)) {
                     this.done = true;
                 }
             }
@@ -42,7 +43,7 @@ public class WaitCarRideBehaviour extends Behaviour {
     @Override
     public int onEnd() {
         System.out.println("Car arrived");
-        // TODO inform shares
+        // TODO FIXME IMPORTANT deregister the service started by the human who started the car share. SEE: ContractNetInitiatorBehaviour:15
         return super.onEnd();
     }
 }
