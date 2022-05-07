@@ -9,7 +9,6 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.util.Pair;
 import org.jgrapht.graph.DefaultWeightedEdge;
-import utils.ServiceUtils;
 
 import java.util.Enumeration;
 import java.util.Vector;
@@ -26,9 +25,6 @@ public class CarShareContractNetInitiator extends ContractNetInitiator {
         this.done = done;
         this.roadPath = roadPath;
         this.graph = graph;
-
-        // start service
-        ServiceUtils.register(this.myAgent, ServiceUtils.buildRideName(this.myAgent.getLocalName()));
     }
 
     protected void handlePropose(ACLMessage propose, Vector v) {

@@ -1,9 +1,9 @@
 package behaviours.human;
 
-import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import messages.StringMessages;
+import utils.ServiceUtils;
 
 /**
  * This behaviour is used to wait for a car to arrive.
@@ -11,10 +11,14 @@ import messages.StringMessages;
  */
 public class WaitCarRideBehaviour extends Behaviour {
 
+    private final FSMHumanBehaviour fsmHumanBehaviour;
+
     private boolean done = false;
 
-    public WaitCarRideBehaviour(Agent a) {
-        super(a);
+    public WaitCarRideBehaviour(FSMHumanBehaviour fsmHumanBehaviour) {
+        super(fsmHumanBehaviour.getAgent());
+
+        this.fsmHumanBehaviour = fsmHumanBehaviour;
     }
 
     @Override
@@ -43,7 +47,11 @@ public class WaitCarRideBehaviour extends Behaviour {
     @Override
     public int onEnd() {
         System.out.println("Car arrived");
-        // TODO FIXME IMPORTANT deregister the service started by the human who started the car share. SEE: ContractNetInitiatorBehaviour:15
+
+        // deregister the service started by the human who started the car share
+        ServiceUtils.deregister(this.myAgent, this.fsmHumanBehaviour.getCurrentCarService());
+        this.fsmHumanBehaviour.setCurrentCarService(null);
+
         return super.onEnd();
     }
 }

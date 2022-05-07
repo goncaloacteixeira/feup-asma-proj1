@@ -22,12 +22,13 @@ public interface ServiceUtils {
      * @return True if the agent was registered successfully.
      */
     static boolean register(Agent agent, String serviceName) {
+        System.out.println("Registering agent " + agent.getLocalName() + " in service " + serviceName);
         DFAgentDescription dfd = new DFAgentDescription();
         dfd.setName(agent.getAID());
 
         ServiceDescription sd = new ServiceDescription();
         sd.setType(serviceName);
-        sd.setName(agent.getLocalName() + "-" + serviceName);
+        sd.setName(serviceName);
         dfd.addServices(sd);
 
         try {
@@ -40,16 +41,17 @@ public interface ServiceUtils {
     }
 
     static boolean deregister(Agent agent, String serviceName) {
+        System.out.printf("Deregistering agent %s from service %s\n", agent.getLocalName(), serviceName);
         DFAgentDescription dfd = new DFAgentDescription();
         dfd.setName(agent.getAID());
 
         ServiceDescription sd = new ServiceDescription();
         sd.setType(serviceName);
-        sd.setName(agent.getLocalName() + "-" + serviceName);
+        sd.setName(serviceName);
         dfd.addServices(sd);
 
         try {
-            DFService.deregister(agent);
+            DFService.deregister(agent, dfd);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

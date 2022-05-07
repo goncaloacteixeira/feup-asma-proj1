@@ -6,6 +6,8 @@ import graph.GraphUtils;
 import graph.edge.Edge;
 import graph.vertex.Point;
 import jade.core.behaviours.FSMBehaviour;
+import lombok.Getter;
+import lombok.Setter;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -37,6 +39,15 @@ public class FSMHumanBehaviour extends FSMBehaviour {
     protected GraphPath<Point, DefaultWeightedEdge> path;
     protected HumanPreferences preferences;
 
+    /**
+     * The name of the service associated with the car that is being used by this human.
+     *
+     * Messages between the car and all passengers using are to be sent through this service.
+     */
+    @Getter
+    @Setter
+    private String currentCarService;
+
     public FSMHumanBehaviour(HumanAgent a, Graph<Point, DefaultWeightedEdge> graph, String src, String dst, HumanPreferences preferences) {
         super(a);
         this.graph = graph;
@@ -57,7 +68,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         this.registerState(new CNIHelperBehaviour(this), STATE_CNI);
         this.registerState(new CNRHelperBehaviour(this), STATE_CNR);
         this.registerState(new AskCarRideBehaviour(this), STATE_RID);
-        this.registerState(new WaitCarRideBehaviour(this.myAgent), STATE_WAI);
+        this.registerState(new WaitCarRideBehaviour(this), STATE_WAI);
 
         this.registerTransition(STATE_EVAL, STATE_CAR, EVENT_CAR);
         this.registerTransition(STATE_EVAL, STATE_DST, EVENT_DST);

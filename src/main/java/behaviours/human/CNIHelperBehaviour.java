@@ -37,6 +37,10 @@ class CNIHelperBehaviour extends Behaviour {
     @Override
     public void onStart() {
         try {
+            // creates the service for everyone in the ride (including the car) to join
+            this.fsmHumanBehaviour.setCurrentCarService(ServiceUtils.buildRideName(myAgent.getLocalName()));
+            ServiceUtils.register(this.myAgent, this.fsmHumanBehaviour.getCurrentCarService());
+
             Point p1 = fsmHumanBehaviour.path.getVertexList().get(fsmHumanBehaviour.currentLocationIndex);
             Point p2 = GraphUtils.roadStop(fsmHumanBehaviour.graph, fsmHumanBehaviour.path, fsmHumanBehaviour.currentLocationIndex);
             System.out.printf("%s: Announcing Car Share from %s to %s\n", myAgent.getLocalName(), p1, p2);

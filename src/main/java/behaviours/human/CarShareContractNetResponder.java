@@ -2,7 +2,6 @@ package behaviours.human;
 
 import graph.RoadPathPoints;
 import graph.vertex.Point;
-import jade.core.Agent;
 import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
@@ -24,12 +23,15 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
     private final Graph<Point, DefaultWeightedEdge> graph;
     private final Pair<String, Boolean> done;
     private final GraphPath<Point, DefaultWeightedEdge> roadPath;
+    private final FSMHumanBehaviour fsmHumanBehaviour;
 
-    public CarShareContractNetResponder(Agent a, ACLMessage cfp, Pair<String, Boolean> done, GraphPath<Point, DefaultWeightedEdge> roadPath, Graph<Point, DefaultWeightedEdge> graph) {
-        super(a, cfp);
+    public CarShareContractNetResponder(FSMHumanBehaviour fsmHumanBehaviour, ACLMessage cfp, Pair<String, Boolean> done, GraphPath<Point, DefaultWeightedEdge> roadPath, Graph<Point, DefaultWeightedEdge> graph) {
+        super(fsmHumanBehaviour.getAgent(), cfp);
         this.done = done;
         this.roadPath = roadPath;
         this.graph = graph;
+
+        this.fsmHumanBehaviour = fsmHumanBehaviour;
     }
 
     @Override
@@ -84,8 +86,11 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         // join the other agent ride service so that the car can communicate with both
-        ServiceUtils.register(this.myAgent, ServiceUtils.buildRideName(accept.getSender().getLocalName()));
+        this.fsmHumanBehaviour.setCurrentCarService(ServiceUtils.buildRideName(accept.getSender().getLocalName()));
+        ServiceUtils.register(this.myAgent, this.fsmHumanBehaviour.getCurrentCarService());
+
         return inform;
     }
 

@@ -76,7 +76,7 @@ public class CarRideContractNetInitiatorBehaviour extends ContractNetInitiator {
                 ACLMessage response = (ACLMessage) o;
                 ACLMessage reply = response.createReply();
                 // accepts the best proposal and rejects the rest
-                if (((CarRideProposeMessage) response.getContentObject()).equals(bestPropose)) {
+                if (response.getContentObject().equals(bestPropose)) {
                     reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
                 } else {
                     reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
