@@ -55,7 +55,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         this.preferences = preferences;
 
         // Humans either init car share or respond to car sharing when they start a new road travel
-        ServiceUtils.register(myAgent, preferences.isCarShareInitiator() ? CAR_SHARE_INIT_SERVICE : CAR_SHARE_RESP_SERVICE);
+        ServiceUtils.joinService((HumanAgent) this.myAgent, preferences.isCarShareInitiator() ? CAR_SHARE_INIT_SERVICE : CAR_SHARE_RESP_SERVICE);
 
         System.out.printf("%s: Path: %s (Cost: %.02f)\n", myAgent.getLocalName(), path.getVertexList(), path.getWeight());
 

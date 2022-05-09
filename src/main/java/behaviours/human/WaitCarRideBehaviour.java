@@ -1,5 +1,6 @@
 package behaviours.human;
 
+import agents.HumanAgent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import messages.StringMessages;
@@ -49,7 +50,8 @@ public class WaitCarRideBehaviour extends Behaviour {
         System.out.println("Car arrived");
 
         // deregister the service started by the human who started the car share
-        ServiceUtils.deregister(this.myAgent, this.fsmHumanBehaviour.getCurrentCarService());
+        HumanAgent humanAgent = (HumanAgent) this.myAgent;
+        ServiceUtils.leaveService(humanAgent, this.fsmHumanBehaviour.getCurrentCarService());
         this.fsmHumanBehaviour.setCurrentCarService(null);
 
         return super.onEnd();

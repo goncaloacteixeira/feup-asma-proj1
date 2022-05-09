@@ -1,5 +1,6 @@
 package behaviours.human;
 
+import agents.HumanAgent;
 import graph.GraphUtils;
 import graph.RoadPathPoints;
 import graph.exceptions.NoRoadsException;
@@ -39,7 +40,7 @@ class CNIHelperBehaviour extends Behaviour {
         try {
             // creates the service for everyone in the ride (including the car) to join
             this.fsmHumanBehaviour.setCurrentCarService(ServiceUtils.buildRideName(myAgent.getLocalName()));
-            ServiceUtils.register(this.myAgent, this.fsmHumanBehaviour.getCurrentCarService());
+            ServiceUtils.joinService((HumanAgent) this.myAgent, this.fsmHumanBehaviour.getCurrentCarService());
 
             Point p1 = fsmHumanBehaviour.path.getVertexList().get(fsmHumanBehaviour.currentLocationIndex);
             Point p2 = GraphUtils.roadStop(fsmHumanBehaviour.graph, fsmHumanBehaviour.path, fsmHumanBehaviour.currentLocationIndex);

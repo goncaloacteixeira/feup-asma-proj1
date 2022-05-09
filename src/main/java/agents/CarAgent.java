@@ -4,16 +4,18 @@ import behaviours.car.CarFSMBehaviour;
 import graph.GraphUtils;
 import graph.vertex.Point;
 import graph.vertex.Semaphore;
-import jade.core.Agent;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import lombok.Getter;
+import lombok.Setter;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
+import utils.ServiceUtils;
 
 import java.io.FileNotFoundException;
 import java.util.Random;
 import java.util.Set;
 
-public class CarAgent extends Agent {
+public class CarAgent extends SubscribableAgent {
 
     @Getter
     private int carCapacity;
@@ -24,11 +26,18 @@ public class CarAgent extends Agent {
     @Getter
     private Point currentLocation;
 
+    @Getter
+    @Setter
+    private DFAgentDescription agentDescription;
+
     @Override
     public void setup() {
         Object[] args = this.getArguments();
 
         this.carCapacity = (int) args[0];
+
+        // register the DF
+        this.agentDescription = ServiceUtils.registerDF(this);
 
         // gets the graph
         try {

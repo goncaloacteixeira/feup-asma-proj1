@@ -1,5 +1,6 @@
 package behaviours.car;
 
+import agents.CarAgent;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import lombok.Setter;
@@ -21,9 +22,9 @@ class CarListeningBehaviour extends Behaviour {
 
     @Override
     public void onStart() {
-        ServiceUtils.register(this.myAgent, ServiceUtils.CAR_RIDE);
+        CarAgent carAgent = (CarAgent) this.myAgent;
+        ServiceUtils.joinService(carAgent, ServiceUtils.CAR_RIDE);
         System.out.println("Car " + this.myAgent.getLocalName() + " is listening");
-
         this.myAgent.addBehaviour(new CarRideContractNetResponderBehaviour(this, this.fsm));
     }
 
@@ -38,7 +39,8 @@ class CarListeningBehaviour extends Behaviour {
 
     @Override
     public int onEnd() {
-        ServiceUtils.deregister(this.myAgent, ServiceUtils.CAR_RIDE);
+        CarAgent carAgent = (CarAgent) this.myAgent;
+        ServiceUtils.leaveService(carAgent, ServiceUtils.CAR_RIDE);
         System.out.printf("%s: Not listening anymore\n", this.myAgent.getLocalName());
 
         this.reset();

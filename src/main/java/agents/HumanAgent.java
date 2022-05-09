@@ -4,19 +4,25 @@ import behaviours.BroadcastBehaviour;
 import behaviours.human.FSMHumanBehaviour;
 import graph.GraphUtils;
 import graph.vertex.Point;
-import jade.core.Agent;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
+import lombok.Getter;
+import lombok.Setter;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import utils.ServiceUtils;
 
 import java.io.FileNotFoundException;
 
-public class HumanAgent extends Agent {
+public class HumanAgent extends SubscribableAgent {
     private final String broadcastService;
     private String srcPoint;
     private String dstPoint;
     private HumanPreferences settings;
+
+    @Getter
+    @Setter
+    private DFAgentDescription agentDescription;
 
     public HumanAgent() {
         this.broadcastService = ServiceUtils.HUMAN_BROADCAST;
@@ -28,6 +34,9 @@ public class HumanAgent extends Agent {
         this.srcPoint = (String) args[0];               // Source Point for Travel
         this.dstPoint = (String) args[1];               // Destiny Point for Travel
         this.settings = (HumanPreferences) args[2];     // Preferences (weights and initiators)
+
+        // join DF service
+        this.agentDescription = ServiceUtils.registerDF(this);
 
         try {
             // for each agent we need to import a new graph since weights vary from agent to agent

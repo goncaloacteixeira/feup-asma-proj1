@@ -1,5 +1,6 @@
 package behaviours.human;
 
+import agents.HumanAgent;
 import graph.RoadPathPoints;
 import graph.vertex.Point;
 import jade.domain.FIPAAgentManagement.FailureException;
@@ -89,7 +90,7 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
 
         // join the other agent ride service so that the car can communicate with both
         this.fsmHumanBehaviour.setCurrentCarService(ServiceUtils.buildRideName(accept.getSender().getLocalName()));
-        ServiceUtils.register(this.myAgent, this.fsmHumanBehaviour.getCurrentCarService());
+        ServiceUtils.joinService((HumanAgent) this.myAgent, this.fsmHumanBehaviour.getCurrentCarService());
 
         return inform;
     }

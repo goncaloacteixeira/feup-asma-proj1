@@ -1,4 +1,3 @@
-import agents.BillboardAgent;
 import agents.CarAgent;
 import agents.HumanAgent;
 import agents.HumanPreferences;
@@ -10,7 +9,6 @@ import jade.core.Runtime;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
-import utils.ServiceUtils;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -37,8 +35,6 @@ public class Launcher {
 
     private static void launchAgents(ContainerController container) {
         try {
-            AgentController billboardController = container.createNewAgent("Billboard", BillboardAgent.class.getName(), new Object[]{ServiceUtils.HUMAN_BROADCAST});
-            billboardController.start();
             Thread.sleep(1000); // time to initialize
 
             Launcher.launchCars(container, 2, 4);
