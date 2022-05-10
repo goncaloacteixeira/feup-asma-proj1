@@ -2,16 +2,14 @@ package behaviours.car;
 
 import agents.CarAgent;
 import graph.GraphUtils;
+import graph.exceptions.CannotMoveException;
 import graph.vertex.Point;
 import jade.core.behaviours.Behaviour;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
 import messages.StringMessages;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import utils.ServiceUtils;
-
-import java.util.Set;
 
 public class CarMoveBehaviour extends Behaviour {
 
@@ -43,7 +41,7 @@ public class CarMoveBehaviour extends Behaviour {
 
     @Override
     public int onEnd() {
-        System.out.printf("%s: CarMoveBehaviour: onEnd()\n", this.carAgent.getLocalName());
+        System.out.printf("%s: Reached humans\n", this.carAgent.getLocalName());
         this.reset();
         return super.onEnd();
     }
@@ -52,15 +50,15 @@ public class CarMoveBehaviour extends Behaviour {
     public void action() {
         if (this.currentPathIndex < this.path.getVertexList().size() - 1) {
             this.currentPathIndex++;
-            this.carAgent.moveTo(this.path.getVertexList().get(this.currentPathIndex));
+            try {
+                this.carAgent.moveTo(this.path.getVertexList().get(this.currentPathIndex));
+            } catch (CannotMoveException e) {
+                // won't happen
+                throw new RuntimeException(e);
+            }
         } else {
             // send message to the human stating that the car has arrived
-            ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-            Set<DFAgentDescription> agents = ServiceUtils.search(this.carAgent, ServiceUtils.buildRideName(this.fsm.getCurrentHuman().getLocalName()));
-            // add all agents as receivers
-            agents.forEach(agent -> msg.addReceiver(agent.getName()));
-            msg.setContent(StringMessages.CAR_ARRIVED);
-            this.myAgent.send(msg);
+            ServiceUtils.sendStringMessageToService(this.myAgent, ServiceUtils.buildRideName(this.fsm.getCurrentHuman().getLocalName()), StringMessages.CAR_ARRIVED, ACLMessage.INFORM);
             this.done = true;
         }
     }

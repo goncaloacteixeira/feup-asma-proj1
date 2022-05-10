@@ -23,6 +23,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
     static String STATE_DST = "DST";
     static String STATE_CNI = "INITIATOR";
     static String STATE_CNR = "RESPONDER";
+    static String STATE_LEC = "LEAVE_CAR";
 
     static int EVENT_DEF = 0;
     static int EVENT_CAR = 1;
@@ -30,6 +31,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
     static int EVENT_INITIATE = 3;
     static int EVENT_RESPOND = 4;
     static int EVENT_FAIL = 5;
+    static int EVENT_CAR_END = 6; // for when the car travel reaches the destination
 
     public final static String CAR_SHARE_INIT_SERVICE = "car-share-initiators";
     public final static String CAR_SHARE_RESP_SERVICE = "car-share-responders";
@@ -69,6 +71,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         this.registerState(new CNRHelperBehaviour(this), STATE_CNR);
         this.registerState(new AskCarRideBehaviour(this), STATE_RID);
         this.registerState(new WaitCarRideBehaviour(this), STATE_WAI);
+        this.registerState(new LeaveCarBehaviour(this), STATE_LEC);
 
         this.registerTransition(STATE_EVAL, STATE_CAR, EVENT_CAR);
         this.registerTransition(STATE_EVAL, STATE_DST, EVENT_DST);
@@ -84,8 +87,9 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         this.registerDefaultTransition(STATE_WAI, STATE_TRC);
 
         this.registerTransition(STATE_TRC, STATE_TRC, EVENT_CAR);
-        this.registerTransition(STATE_TRC, STATE_EVAL, EVENT_DEF);
-        this.registerTransition(STATE_TRC, STATE_DST, EVENT_DST);
+        this.registerTransition(STATE_TRC, STATE_LEC, EVENT_CAR_END);
+        this.registerTransition(STATE_LEC, STATE_EVAL, EVENT_DEF);
+        this.registerTransition(STATE_LEC, STATE_DST, EVENT_DST);
     }
 
     /**

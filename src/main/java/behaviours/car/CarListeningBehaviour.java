@@ -41,7 +41,6 @@ class CarListeningBehaviour extends Behaviour {
     public int onEnd() {
         CarAgent carAgent = (CarAgent) this.myAgent;
         ServiceUtils.leaveService(carAgent, ServiceUtils.CAR_RIDE);
-        System.out.printf("%s: Not listening anymore\n", this.myAgent.getLocalName());
 
         this.reset();
         return CarFSMBehaviour.EVENT_PROPOSAL_ACCEPTED;

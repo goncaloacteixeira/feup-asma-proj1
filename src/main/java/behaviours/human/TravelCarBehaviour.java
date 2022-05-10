@@ -1,8 +1,12 @@
 package behaviours.human;
 
-import graph.edge.Edge;
-import graph.edge.RoadEdge;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.UnreadableException;
+import messages.OnArrivalMessage;
+import messages.OnPlaceInformMessage;
+
+import java.io.Serializable;
 
 class TravelCarBehaviour extends OneShotBehaviour {
     private final FSMHumanBehaviour fsmHumanBehaviour;
@@ -18,30 +22,56 @@ class TravelCarBehaviour extends OneShotBehaviour {
         this.fsmHumanBehaviour = fsmHumanBehaviour;
     }
 
+    /**
+     * The car will send a message anytime it arrives to a new point in the graph.
+     * This waits for said messages,
+     * and anytime a message arrives, it moves to the next point in the graph
+     * // TODO this is assuming that the path of the car and the path of the human is the same
+     *
+     * When the car arrives to the destination, it also sends a message, this time of type OnArrivalMessage
+     */
     @Override
     public void action() {
-        String message = fsmHumanBehaviour.informTravel();
-        System.out.println(message);
-        // ((HumanAgent) myAgent).informMovement(msg);
+        ACLMessage msg = this.myAgent.receive();
 
-        fsmHumanBehaviour.currentLocationIndex++;
-
-        if (fsmHumanBehaviour.currentLocationIndex == fsmHumanBehaviour.path.getLength()) {
-            exitValue = FSMHumanBehaviour.EVENT_DST;
-            return;
-        }
-
-        Edge edge = (Edge) fsmHumanBehaviour.path.getEdgeList().get(fsmHumanBehaviour.currentLocationIndex);
-
-        if (edge instanceof RoadEdge) {
-            exitValue = FSMHumanBehaviour.EVENT_CAR;
+        if (msg != null) {
+            // get object content of message
+            try {
+                Serializable object = msg.getContentObject();
+                if (object instanceof OnPlaceInformMessage) {
+                    // then the car moved to a new point
+                    OnPlaceInformMessage onPlaceInformMessage = (OnPlaceInformMessage) object;
+                    System.out.printf("%s to %s: moved to %s\n", msg.getSender().getLocalName(), this.myAgent.getLocalName(), onPlaceInformMessage.getPlace());
+                    // TODO this is assuming that the path of the car and the path of the human is the same
+                    this.move();
+                    this.exitValue = FSMHumanBehaviour.EVENT_CAR;
+                } else if (object instanceof OnArrivalMessage) {
+                    System.out.printf("%s to %s: arrived\n", msg.getSender().getLocalName(), this.myAgent.getLocalName());
+                    // then the car arrived to the destination
+                    this.exitValue = FSMHumanBehaviour.EVENT_CAR_END;
+                } else {
+                    // TODO
+                    System.out.println("Unknown message");
+                }
+            } catch (UnreadableException e) {
+                // TODO
+                throw new RuntimeException(e);
+            }
         } else {
-            exitValue = FSMHumanBehaviour.EVENT_DEF;
+            this.exitValue = FSMHumanBehaviour.EVENT_CAR;
         }
     }
 
     @Override
     public int onEnd() {
-        return exitValue;
+        return this.exitValue;
+    }
+
+    private void move() {
+        String message = fsmHumanBehaviour.informTravel();
+        System.out.println(message);
+        // ((HumanAgent) myAgent).informMovement(msg);
+
+        fsmHumanBehaviour.currentLocationIndex++;
     }
 }

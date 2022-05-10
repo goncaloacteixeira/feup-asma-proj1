@@ -6,7 +6,10 @@ import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
+import jade.lang.acl.ACLMessage;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,9 +33,8 @@ public interface ServiceUtils {
     /**
      * Registers the agent in a DF service.
      *
-     * @param agent            The agent to register.
-     *
-     * @param serviceName      The name of the service.
+     * @param agent       The agent to register.
+     * @param serviceName The name of the service.
      * @return True if the agent was registered successfully.
      */
     static boolean joinService(SubscribableAgent agent, String serviceName) {
@@ -90,5 +92,40 @@ public interface ServiceUtils {
 
     static String buildRideName(String agentName) {
         return agentName + "-" + "ride";
+    }
+
+    /**
+     * Sends a string message to all agents in the given service.
+     *
+     * @param agent         the agent that sends the message
+     * @param serviceName   the name of the service
+     * @param messageString the message to send
+     * @param performative  the performative to use
+     */
+    static void sendStringMessageToService(Agent agent, String serviceName, String messageString, int performative) {
+        ACLMessage msg = new ACLMessage(performative);
+        Set<DFAgentDescription> agents = ServiceUtils.search(agent, serviceName);
+        // add all agents as receivers
+        agents.forEach(a -> msg.addReceiver(a.getName()));
+        msg.setContent(messageString);
+        agent.send(msg);
+    }
+
+    /**
+     * Sends a message to all agents in the given service.
+     *
+     * @param agent        the agent that sends the message
+     * @param serviceName  the name of the service
+     * @param message      the message to send
+     * @param performative the performative to use
+     * @throws IOException if the message cannot be serialized
+     */
+    static void sendMessageToService(Agent agent, String serviceName, Serializable message, int performative) throws IOException {
+        ACLMessage msg = new ACLMessage(performative);
+        Set<DFAgentDescription> agents = ServiceUtils.search(agent, serviceName);
+        // add all agents as receivers
+        agents.forEach(a -> msg.addReceiver(a.getName()));
+        msg.setContentObject(message);
+        agent.send(msg);
     }
 }

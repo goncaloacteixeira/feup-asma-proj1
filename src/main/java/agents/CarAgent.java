@@ -2,6 +2,7 @@ package agents;
 
 import behaviours.car.CarFSMBehaviour;
 import graph.GraphUtils;
+import graph.exceptions.CannotMoveException;
 import graph.vertex.Point;
 import graph.vertex.Semaphore;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -57,9 +58,13 @@ public class CarAgent extends SubscribableAgent {
         this.addBehaviour(new CarFSMBehaviour(this));
     }
 
-    public void moveTo(Point point) {
-        // TODO verify if possible and adjacent
-        System.out.printf("%s: moving from [%s] to [%s]%n", this.getLocalName(), this.currentLocation.getName(), point.getName());
-        this.currentLocation = point;
+    public void moveTo(Point point) throws CannotMoveException {
+        // TODO take time to move according to the weight in the graph
+        if (GraphUtils.isAdjacent(this.graph, this.currentLocation, point)) {
+            System.out.printf("%s: moving from [%s] to [%s]%n", this.getLocalName(), this.currentLocation.getName(), point.getName());
+            this.currentLocation = point;
+        } else {
+            throw new CannotMoveException("Cannot move from " + this.currentLocation.getName() + " to " + point.getName());
+        }
     }
 }

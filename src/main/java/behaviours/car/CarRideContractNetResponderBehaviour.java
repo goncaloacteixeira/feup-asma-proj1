@@ -47,18 +47,19 @@ public class CarRideContractNetResponderBehaviour extends ContractNetResponder {
 
         this.path = GraphUtils.getPathFromAtoB(((CarAgent) this.carListeningBehaviour.getAgent()).getGraph(), start.getName(), end.getName());
 
-        // calculates metrics of the ride
-//        var currentPath = FIXME
-//        var ridePath = FIXME
-        var price = 5; // FIXME
-        var distance = 10; // FIXME
-        var capacity = 2; // FIXME
+        // gets the path from current location to the start of the ride
+        CarAgent carAgent = (CarAgent) this.myAgent;
+        var pathToStart = GraphUtils.getPathFromAtoB(carAgent.getGraph(), carAgent.getCurrentLocation().getName(), start.getName());
+        double pathToStartCost = pathToStart.getWeight();
+        double travelCost = this.path.getWeight();
+
+        float price = (float) (travelCost + pathToStartCost); // TODO add negotiation that adds profit on top of this
 
         // builds the proposal
         ACLMessage reply = cfp.createReply();
         reply.setPerformative(ACLMessage.PROPOSE);
         try {
-            reply.setContentObject(new CarRideProposeMessage(price, distance, capacity, this.myAgent.getName()));
+            reply.setContentObject(new CarRideProposeMessage(price, (float) travelCost, carAgent.getCarCapacity(), this.myAgent.getName()));
         } catch (IOException e) {
             e.printStackTrace();
             return null;
