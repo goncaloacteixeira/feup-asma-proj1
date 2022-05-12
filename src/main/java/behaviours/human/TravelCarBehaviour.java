@@ -38,9 +38,8 @@ class TravelCarBehaviour extends OneShotBehaviour {
             // get object content of message
             try {
                 Serializable object = msg.getContentObject();
-                if (object instanceof OnPlaceInformMessage) {
+                if (object instanceof OnPlaceInformMessage onPlaceInformMessage) {
                     // then the car moved to a new point
-                    OnPlaceInformMessage onPlaceInformMessage = (OnPlaceInformMessage) object;
                     System.out.printf("%s to %s: moved to %s\n", msg.getSender().getLocalName(), this.myAgent.getLocalName(), onPlaceInformMessage.getPlace());
                     // TODO this is assuming that the path of the car and the path of the human is the same
                     this.move();

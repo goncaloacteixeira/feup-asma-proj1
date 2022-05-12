@@ -6,12 +6,15 @@ import jade.core.behaviours.Behaviour;
 import lombok.Setter;
 import utils.ServiceUtils;
 
-class CarListeningBehaviour extends Behaviour {
+public class CarListeningBehaviour extends Behaviour {
 
     private final CarFSMBehaviour fsm;
 
     @Setter
     private boolean done;
+
+    @Setter
+    private boolean onHold;
 
     public CarListeningBehaviour(Agent a, CarFSMBehaviour fsm) {
         super(a);
@@ -43,7 +46,13 @@ class CarListeningBehaviour extends Behaviour {
         ServiceUtils.leaveService(carAgent, ServiceUtils.CAR_RIDE);
 
         this.reset();
-        return CarFSMBehaviour.EVENT_PROPOSAL_ACCEPTED;
+        if (this.onHold) {
+            // if on hold, wait for confirmation to start moving
+            return CarFSMBehaviour.EVENT_PROPOSAL_ACCEPTED;
+        }
+
+        // else come back to listening
+        return super.onEnd();
     }
 
     @Override

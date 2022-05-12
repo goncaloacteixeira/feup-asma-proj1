@@ -37,7 +37,7 @@ public class Launcher {
         try {
             Thread.sleep(1000); // time to initialize
 
-            Launcher.launchCars(container, 2, 4);
+            Launcher.launchCars(container, 5, 4);
             // generateMultipleRandomAgents(container);
             generateTwoAgents(container);
 
