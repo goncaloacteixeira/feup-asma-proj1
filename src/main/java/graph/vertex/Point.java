@@ -5,8 +5,8 @@ import graph.Colorable;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class Point implements Colorable {
-    private String name;
+public class Point implements Colorable, Serializable {
+    private final String name;
 
     public Point(String name) {
         this.name = name;

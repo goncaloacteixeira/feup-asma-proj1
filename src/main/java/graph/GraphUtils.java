@@ -20,19 +20,20 @@ import org.jgrapht.nio.dot.DOTExporter;
 import org.jgrapht.nio.dot.DOTImporter;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class GraphUtils {
-    private GraphUtils() {}
+
+    private static final String DEFAULT_GRAPH_FILENAME = "citygraph.dot";
+
+    private GraphUtils() {
+    }
 
     /**
      * Export a graph to DOT format with some attributes
+     *
      * @param outputStream output for the DOT graph
-     * @param g original graph
+     * @param g            original graph
      */
     public static void exportToDOT(OutputStream outputStream, Graph<Point, DefaultWeightedEdge> g) {
         DOTExporter<Point, DefaultWeightedEdge> export = new DOTExporter<>();
@@ -57,6 +58,7 @@ public class GraphUtils {
 
     /**
      * Import a graph from a DOT format
+     *
      * @param inputStream input for the graph object
      * @return parsed graph
      */
@@ -72,7 +74,8 @@ public class GraphUtils {
                     case "point" -> point = new Point(vertex);
                     case "station" -> point = new Station(vertex);
                     case "semaphore" -> point = new Semaphore(vertex);
-                    default -> {}
+                    default -> {
+                    }
                 }
             }
 
@@ -87,7 +90,8 @@ public class GraphUtils {
                     case "road" -> edge = new RoadEdge();
                     case "subway" -> edge = new SubwayEdge();
                     case "street" -> edge = new StreetEdge();
-                    default -> {}
+                    default -> {
+                    }
                 }
             }
 
@@ -103,9 +107,10 @@ public class GraphUtils {
 
     /**
      * Get the shortest path from A to B
+     *
      * @param graph original graph
-     * @param a source point
-     * @param b destination point
+     * @param a     source point
+     * @param b     destination point
      * @return the shortest path from A to B
      */
     public static GraphPath<Point, DefaultWeightedEdge> getPathFromAtoB(Graph<Point, DefaultWeightedEdge> graph, String a, String b) {
@@ -119,15 +124,15 @@ public class GraphUtils {
      * This method allows to import a graph with custom weight settings, for every weight property, if you assign
      * a non-positive value (less than or equal to zero) the weight is unchanged. You can force the shortest path
      * to not follow a certain type of edge you can assign Integer.MAX_VALUE.
-     *
+     * <p>
      * We shouldn't totally remove edges since it may lead to a non-connected graph. The graph is connected on
      * street edges tho.
      *
-     * @param filename      filename for the graph.dot
-     * @param streetWeight  weight for street edges (walking)
-     * @param roadWeight    weight for road edges (car/uber)
-     * @param subwayWeight  weight for subway edges
-     * @return  a graph with custom weights
+     * @param filename     filename for the graph.dot
+     * @param streetWeight weight for street edges (walking)
+     * @param roadWeight   weight for road edges (car/uber)
+     * @param subwayWeight weight for subway edges
+     * @return a graph with custom weights
      */
     public static Graph<Point, DefaultWeightedEdge> importGraph(String filename, double streetWeight, double roadWeight, double subwayWeight) throws FileNotFoundException {
         Graph<Point, DefaultWeightedEdge> graph = GraphUtils.getFromDOT(new FileInputStream(new File(filename)));
@@ -153,13 +158,17 @@ public class GraphUtils {
         return GraphUtils.getFromDOT(new FileInputStream(filename));
     }
 
+    public static Graph<Point, DefaultWeightedEdge> importDefaultGraph() throws FileNotFoundException {
+        return GraphUtils.importGraph(GraphUtils.DEFAULT_GRAPH_FILENAME);
+    }
+
     /**
-     * @deprecated should not be using this method, have detected some memory leaks
-     *
-     * Method to get a Path in a pretty-printed format
      * @param graph original graph
-     * @param path related path
+     * @param path  related path
      * @return string containing the pretty-printed path
+     * @deprecated should not be using this method, have detected some memory leaks
+     * <p>
+     * Method to get a Path in a pretty-printed format
      */
     @Deprecated
     public static String printPath(Graph<Point, DefaultWeightedEdge> graph, GraphPath<Point, DefaultWeightedEdge> path) {
@@ -186,8 +195,8 @@ public class GraphUtils {
      * - for currentIndex = 2 -> F <p>
      * - for currentIndex = 4 -> F <p>
      *
-     * @param graph original graph
-     * @param graphPath path
+     * @param graph        original graph
+     * @param graphPath    path
      * @param currentIndex current position - index for the point on the path
      * @return the last point for the road segment
      * @throws NoRoadsException when there's no road right ahead for the current position
@@ -207,14 +216,15 @@ public class GraphUtils {
         }
 
         if (stop == null) throw new NoRoadsException();
-        
+
         return stop;
     }
 
     /**
      * Calculate the actual cost for the path
+     *
      * @param graph original graph
-     * @param path resulting path
+     * @param path  resulting path
      * @return path cost
      */
     public static double calculateCost(Graph<Point, DefaultWeightedEdge> graph, GraphPath<Point, DefaultWeightedEdge> path) {
@@ -223,5 +233,27 @@ public class GraphUtils {
             cost += graph.getEdgeWeight(e);
         }
         return cost;
+    }
+
+    public static Set<Semaphore> getSemaphores(Graph<Point, DefaultWeightedEdge> graph) {
+        Set<Semaphore> semaphores = new HashSet<>();
+        for (Point point : graph.vertexSet()) {
+            if (point instanceof Semaphore) {
+                semaphores.add((Semaphore) point);
+            }
+        }
+        return semaphores;
+    }
+
+    /**
+     * Verifies if two points are adjacent in a graph.
+     *
+     * @param graph the graph to be checked
+     * @param a     the first point
+     * @param b     the second point
+     * @return true if the points are adjacent, false otherwise
+     */
+    public static boolean isAdjacent(Graph<Point, DefaultWeightedEdge> graph, Point a, Point b) {
+        return graph.containsEdge(a, b);
     }
 }

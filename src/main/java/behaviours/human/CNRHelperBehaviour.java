@@ -3,7 +3,6 @@ package behaviours.human;
 import graph.GraphUtils;
 import graph.exceptions.NoRoadsException;
 import graph.vertex.Point;
-import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
@@ -15,8 +14,8 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 
 class CNRHelperBehaviour extends Behaviour {
     private final FSMHumanBehaviour fsmHumanBehaviour;
-    private MessageTemplate messageTemplate;
-    private Pair<String, Boolean> done = Pair.of("done", false);
+    private final MessageTemplate messageTemplate;
+    private final Pair<String, Boolean> done = Pair.of("done", false);
     private boolean busy = false;
     private int attempts = 0;
 
@@ -75,7 +74,7 @@ class CNRHelperBehaviour extends Behaviour {
 
                     GraphPath<Point, DefaultWeightedEdge> roadPath = GraphUtils.getPathFromAtoB(fsmHumanBehaviour.graph, p1.getName(), p2.getName());
 
-                    Behaviour behaviour = new CarShareContractNetResponder(myAgent, cfp, done, roadPath, fsmHumanBehaviour.graph);
+                    Behaviour behaviour = new CarShareContractNetResponder(this.fsmHumanBehaviour, cfp, done, roadPath, fsmHumanBehaviour.graph);
                     busy = true;
                     myAgent.addBehaviour(behaviour);
                 } catch (NoRoadsException e) {

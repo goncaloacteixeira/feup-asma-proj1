@@ -1,18 +1,14 @@
 package behaviours.human;
 
+import agents.HumanAgent;
 import graph.RoadPathPoints;
 import graph.vertex.Point;
-import jade.core.Agent;
-import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
-import jade.proto.ContractNetResponder;
 import jade.proto.SSContractNetResponder;
-import jade.proto.SSIteratedContractNetResponder;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.util.Pair;
@@ -20,9 +16,6 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import utils.ServiceUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import static org.apache.commons.math3.util.Precision.round;
@@ -31,12 +24,15 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
     private final Graph<Point, DefaultWeightedEdge> graph;
     private final Pair<String, Boolean> done;
     private final GraphPath<Point, DefaultWeightedEdge> roadPath;
+    private final FSMHumanBehaviour fsmHumanBehaviour;
 
-    public CarShareContractNetResponder(Agent a, ACLMessage cfp, Pair<String, Boolean> done, GraphPath<Point, DefaultWeightedEdge> roadPath, Graph<Point, DefaultWeightedEdge> graph) {
-        super(a, cfp);
+    public CarShareContractNetResponder(FSMHumanBehaviour fsmHumanBehaviour, ACLMessage cfp, Pair<String, Boolean> done, GraphPath<Point, DefaultWeightedEdge> roadPath, Graph<Point, DefaultWeightedEdge> graph) {
+        super(fsmHumanBehaviour.getAgent(), cfp);
         this.done = done;
         this.roadPath = roadPath;
         this.graph = graph;
+
+        this.fsmHumanBehaviour = fsmHumanBehaviour;
     }
 
     @Override
@@ -50,7 +46,7 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
         }
 
         // Only accept equal segment paths
-        if (!roadPath.getStartVertex().getName().equals(pathPoints.srcPoint) || !roadPath.getEndVertex().getName().equals(pathPoints.dstPoint)) {
+        if (!roadPath.getStartVertex().getName().equals(pathPoints.srcPoint()) || !roadPath.getEndVertex().getName().equals(pathPoints.dstPoint())) {
             ACLMessage refusal = cfp.createReply();
             refusal.setPerformative(ACLMessage.REFUSE);
             return refusal;
@@ -91,6 +87,11 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        // join the other agent ride service so that the car can communicate with both
+        this.fsmHumanBehaviour.setCurrentCarService(ServiceUtils.buildRideName(accept.getSender().getLocalName()));
+        ServiceUtils.joinService((HumanAgent) this.myAgent, this.fsmHumanBehaviour.getCurrentCarService());
+
         return inform;
     }
 

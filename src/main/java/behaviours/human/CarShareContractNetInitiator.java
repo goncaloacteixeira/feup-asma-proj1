@@ -1,10 +1,7 @@
 package behaviours.human;
 
 import graph.vertex.Point;
-import jade.core.AID;
 import jade.core.Agent;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import jade.proto.ContractNetInitiator;
@@ -12,19 +9,15 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.util.Pair;
 import org.jgrapht.graph.DefaultWeightedEdge;
-import utils.ServiceUtils;
 
-import java.util.Arrays;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
-import java.util.function.Function;
 
 public class CarShareContractNetInitiator extends ContractNetInitiator {
     private final Pair<String, Boolean> done;
     private final Graph<Point, DefaultWeightedEdge> graph;
     private int nResponders;
-    private GraphPath<Point, DefaultWeightedEdge> roadPath;
+    private final GraphPath<Point, DefaultWeightedEdge> roadPath;
 
     public CarShareContractNetInitiator(Agent a, ACLMessage cfp, int nResponders, Pair<String, Boolean> done, GraphPath<Point, DefaultWeightedEdge> roadPath, Graph<Point, DefaultWeightedEdge> graph) {
         super(a, cfp);

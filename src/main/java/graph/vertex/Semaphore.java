@@ -2,7 +2,9 @@ package graph.vertex;
 
 import graph.Colorable;
 
-public class Semaphore extends Point {
+import java.io.Serializable;
+
+public class Semaphore extends Point implements Serializable {
     public Semaphore(String name) {
         super(name);
     }
