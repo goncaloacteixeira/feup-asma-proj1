@@ -57,7 +57,7 @@ public interface ServiceUtils {
     }
 
     static boolean leaveService(SubscribableAgent agent, String serviceName) {
-        System.out.printf("Deregistering agent %s from service %s\n", agent.getLocalName(), serviceName);
+        System.out.println("Unregistering agent " + agent.getLocalName() + " from service " + serviceName);
 
         ServiceDescription sd = new ServiceDescription();
         sd.setType(serviceName);
@@ -70,6 +70,7 @@ public interface ServiceUtils {
             agent.setAgentDescription(DFService.modify(agent, agentDescription));
             return true;
         } catch (FIPAException e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -106,6 +107,7 @@ public interface ServiceUtils {
         ACLMessage msg = new ACLMessage(performative);
         Set<DFAgentDescription> agents = ServiceUtils.search(agent, serviceName);
         // add all agents as receivers
+        System.out.printf("%s: Sending message to %d agents in service %s\n", agent.getLocalName(), agents.size(), serviceName);
         agents.forEach(a -> msg.addReceiver(a.getName()));
         msg.setContent(messageString);
         agent.send(msg);

@@ -32,6 +32,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
     static int EVENT_RESPOND = 4;
     static int EVENT_FAIL = 5;
     static int EVENT_CAR_END = 6; // for when the car travel reaches the destination
+    static int EVENT_FOUND_SHARE = 7;
 
     public final static String CAR_SHARE_INIT_SERVICE = "car-share-initiators";
     public final static String CAR_SHARE_RESP_SERVICE = "car-share-responders";
@@ -43,7 +44,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
 
     /**
      * The name of the service associated with the car that is being used by this human.
-     *
+     * <p>
      * Messages between the car and all passengers using are to be sent through this service.
      */
     @Getter
@@ -59,7 +60,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         // Humans either init car share or respond to car sharing when they start a new road travel
         ServiceUtils.joinService((HumanAgent) this.myAgent, preferences.isCarShareInitiator() ? CAR_SHARE_INIT_SERVICE : CAR_SHARE_RESP_SERVICE);
 
-        System.out.printf("%s: Path: %s (Cost: %.02f)\n", myAgent.getLocalName(), path.getVertexList(), path.getWeight());
+        System.out.printf("%s: Path: %s with edges %s (Cost: %.02f)\n", myAgent.getLocalName(), path.getVertexList(), path, path.getWeight());
 
         this.registerFirstState(new EvaluatePathBehaviour(this), STATE_EVAL);
         this.registerLastState(new DestinationBehaviour(this), STATE_DST);
@@ -81,7 +82,8 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         this.registerTransition(STATE_CAR, STATE_CNI, EVENT_INITIATE);
         this.registerTransition(STATE_CAR, STATE_CNR, EVENT_RESPOND);
         this.registerDefaultTransition(STATE_CNI, STATE_RID); // after taking care of car sharing, ask for car ride
-        this.registerDefaultTransition(STATE_CNR, STATE_WAI); // after getting a share, waits for the car ride
+        this.registerDefaultTransition(STATE_CNR, STATE_RID); // if it doesn't get any share, go ask for the car themselves
+        this.registerTransition(STATE_CNR, STATE_WAI, EVENT_FOUND_SHARE); // if it did find a share, wait for the car to arrive
         this.registerDefaultTransition(STATE_RID, STATE_WAI);
         this.registerTransition(STATE_WAI, STATE_EVAL, EVENT_FAIL); // if there is a problem with the car ride, go back to eval
         this.registerDefaultTransition(STATE_WAI, STATE_TRC);

@@ -36,7 +36,8 @@ public class CarMoveBehaviour extends Behaviour {
     @Override
     public void onStart() {
         // path until first of currentPath
-        this.path = GraphUtils.getPathFromAtoB(this.carAgent.getGraph(), this.carAgent.getCurrentLocation().getName(), this.fsm.getCurrentPath().getVertexList().get(0).getName());
+        this.path = GraphUtils.getRoadPathFromAtoB(this.carAgent.getGraph(), this.carAgent.getCurrentLocation().getName(), this.fsm.getCurrentPath().getVertexList().get(0).getName());
+        System.out.printf("%s: Moving with path %s\n", this.carAgent.getLocalName(), this.path.getVertexList());
     }
 
     @Override
@@ -72,5 +73,6 @@ public class CarMoveBehaviour extends Behaviour {
     public void reset() {
         super.reset();
         this.done = false;
+        this.currentPathIndex = 0;
     }
 }

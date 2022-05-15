@@ -109,7 +109,7 @@ public class CarRideContractNetInitiatorBehaviour extends ContractNetInitiator {
                 // we accept the saved proposal
                 this.askCarRideBehaviour.confirmBestProposal();
 
-                System.out.printf("%s: no better proposals, accepting saved proposal\n", this.myAgent.getLocalName());
+                System.out.printf("%s: no better proposals, accepting saved proposal: %.2f from %s\n", this.myAgent.getLocalName(), this.askCarRideBehaviour.getBestValue(), this.askCarRideBehaviour.getBestCar().getLocalName());
                 return;
             }
 
@@ -139,8 +139,6 @@ public class CarRideContractNetInitiatorBehaviour extends ContractNetInitiator {
             System.out.printf("%s: could not read propose message, aborting.\n", this.myAgent.getLocalName());
             throw new RuntimeException(e);
         }
-
-        System.out.println(acceptances.size());
     }
 
     @Override

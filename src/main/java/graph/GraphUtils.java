@@ -120,6 +120,21 @@ public class GraphUtils {
         return iPaths.getPath(Point.instance(b));
     }
 
+    public static GraphPath<Point, DefaultWeightedEdge> getRoadPathFromAtoB(Graph<Point, DefaultWeightedEdge> graph, String a, String b) {
+        // create a new graph with only road edges
+        Graph<Point, DefaultWeightedEdge> roadGraph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
+        graph.edgeSet().stream().filter(edge -> edge instanceof RoadEdge).forEach(edge -> {
+            roadGraph.addVertex(graph.getEdgeSource(edge));
+            roadGraph.addVertex(graph.getEdgeTarget(edge));
+            roadGraph.addEdge(graph.getEdgeSource(edge), graph.getEdgeTarget(edge), edge);
+        });
+
+        DijkstraShortestPath<Point, DefaultWeightedEdge> dijkstraAlg = new DijkstraShortestPath<>(roadGraph);
+        ShortestPathAlgorithm.SingleSourcePaths<Point, DefaultWeightedEdge> iPaths = dijkstraAlg.getPaths(Point.instance(a));
+
+        return iPaths.getPath(Point.instance(b));
+    }
+
     /**
      * This method allows to import a graph with custom weight settings, for every weight property, if you assign
      * a non-positive value (less than or equal to zero) the weight is unchanged. You can force the shortest path
@@ -212,7 +227,7 @@ public class GraphUtils {
             if (!(edge instanceof RoadEdge)) {
                 break;
             }
-            stop = graph.getEdgeTarget(edge);
+            stop = graphPath.getVertexList().get(i + 1);
         }
 
         if (stop == null) throw new NoRoadsException();

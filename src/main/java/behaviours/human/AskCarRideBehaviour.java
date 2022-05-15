@@ -7,6 +7,7 @@ import graph.vertex.Point;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
+import lombok.Getter;
 import lombok.Setter;
 import messages.CarRideProposeMessage;
 import messages.StringMessages;
@@ -41,8 +42,10 @@ public class AskCarRideBehaviour extends Behaviour{
      * This is supposed to start as the lowest possible price (the length of the shortest path), and raise by INCREMENT
      *  until a car accepts the offer.
      */
+    @Getter
     private float bestValue;
 
+    @Getter
     private AID bestCar;
 
     public AskCarRideBehaviour(FSMHumanBehaviour fsmHumanBehaviour) {
@@ -72,6 +75,21 @@ public class AskCarRideBehaviour extends Behaviour{
         } catch (NoRoadsException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void reset() {
+        this.bestValue = -1;
+        this.bestCar = null;
+        this.isDiscussing = false;
+        this.done = false;
+        super.reset();
+    }
+
+    @Override
+    public int onEnd() {
+        this.reset();
+        return super.onEnd();
     }
 
     @Override
