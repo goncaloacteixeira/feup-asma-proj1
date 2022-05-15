@@ -34,6 +34,7 @@ public class CarTransportBehaviour extends Behaviour {
     public int onEnd() {
         // TODO the car can simply quit which would trigger another event? this event will put the car into listening again
         System.out.printf("%s: transport behaviour ended\n", this.carAgent.getLocalName());
+        this.carFSMBehaviour.removeHuman();
         this.reset();
         return CarFSMBehaviour.EVENT_TRAVEL_END;
     }
@@ -75,5 +76,6 @@ public class CarTransportBehaviour extends Behaviour {
     public void reset() {
         super.reset();
         this.done = false;
+        this.currentPathIndex = 0;
     }
 }

@@ -38,6 +38,15 @@ public class CarRideContractNetResponderBehaviour extends ContractNetResponder {
     protected ACLMessage handleCfp(ACLMessage cfp) {
         System.out.printf("%s: Received CFP from %s\n", myAgent.getLocalName(), cfp.getSender().getLocalName());
 
+        // rejects if already has human
+        // this fixes a bug where the car would accept a ride after accepting others, because of delay
+        if (this.fsm.hasHuman()) {
+            System.out.printf("%s: Rejecting because our loyalty is with %s\n", myAgent.getLocalName(), this.fsm.getCurrentHuman().getLocalName());
+            ACLMessage reply = cfp.createReply();
+            reply.setPerformative(ACLMessage.REFUSE);
+            return reply;
+        }
+
         // gets the message info
         try {
             // if the content is a blind request message
@@ -79,7 +88,7 @@ public class CarRideContractNetResponderBehaviour extends ContractNetResponder {
 
         ACLMessage reply = accept.createReply();
         reply.setPerformative(ACLMessage.INFORM);
-        System.out.printf("%s: Proposal accepted.\n", myAgent.getLocalName());
+        System.out.printf("%s: Proposal from %s accepted.\n", myAgent.getLocalName(), accept.getSender().getLocalName());
 
         this.carListeningBehaviour.setDone(true);
         this.carListeningBehaviour.setOnHold(true);
@@ -87,7 +96,7 @@ public class CarRideContractNetResponderBehaviour extends ContractNetResponder {
     }
 
     private ACLMessage handleBlindRequest(ACLMessage cfp, CarRideCFPBlindRequestMessage message) throws IOException {
-        this.path = GraphUtils.getPathFromAtoB(((CarAgent) this.carListeningBehaviour.getAgent()).getGraph(), message.getStart().getName(), message.getEnd().getName());
+        this.path = GraphUtils.getRoadPathFromAtoB(((CarAgent) this.carListeningBehaviour.getAgent()).getGraph(), message.getStart().getName(), message.getEnd().getName());
 
         double totalCost = this.getTotalCost(message.getStart());
 
@@ -104,7 +113,7 @@ public class CarRideContractNetResponderBehaviour extends ContractNetResponder {
     }
 
     private ACLMessage handlePriceRequest(ACLMessage cfp, CarRideCFPRequestMessage message) throws IOException {
-        this.path = GraphUtils.getPathFromAtoB(((CarAgent) this.carListeningBehaviour.getAgent()).getGraph(), message.getStart().getName(), message.getEnd().getName());
+        this.path = GraphUtils.getRoadPathFromAtoB(((CarAgent) this.carListeningBehaviour.getAgent()).getGraph(), message.getStart().getName(), message.getEnd().getName());
 
         double totalCost = this.getTotalCost(message.getStart());
 
@@ -131,7 +140,7 @@ public class CarRideContractNetResponderBehaviour extends ContractNetResponder {
     private double getTotalCost(Point start) {
         // gets the path from current location to the start of the ride
         CarAgent carAgent = (CarAgent) this.myAgent;
-        var pathToStart = GraphUtils.getPathFromAtoB(carAgent.getGraph(), carAgent.getCurrentLocation().getName(), start.getName());
+        var pathToStart = GraphUtils.getRoadPathFromAtoB(carAgent.getGraph(), carAgent.getCurrentLocation().getName(), start.getName());
         double pathToStartCost = pathToStart.getWeight();
         double travelCost = this.path.getWeight();
         return pathToStartCost + travelCost;

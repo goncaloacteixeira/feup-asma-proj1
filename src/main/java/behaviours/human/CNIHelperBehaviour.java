@@ -59,9 +59,15 @@ class CNIHelperBehaviour extends Behaviour {
 
     @Override
     public int onEnd() {
-        busy = false;
-        done.setSecond(false);
+        this.reset();
         return super.onEnd();
+    }
+
+    @Override
+    public void reset() {
+        this.busy = false;
+        this.done.setSecond(false);
+        super.reset();
     }
 
     /**

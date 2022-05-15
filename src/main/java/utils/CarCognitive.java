@@ -33,7 +33,7 @@ public interface CarCognitive {
         }
 
         // accept with 75% chance
-        return Math.random() < 0.75;
+        return Math.random() < 0.5;
     }
 
     static float getBetterRidePrice(double pathCost, float askedPrice) {

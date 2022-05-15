@@ -1,5 +1,6 @@
 package behaviours.human;
 
+import agents.HumanAgent;
 import graph.GraphUtils;
 import graph.exceptions.NoRoadsException;
 import graph.vertex.Point;
@@ -7,9 +8,11 @@ import jade.core.behaviours.Behaviour;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import lombok.Setter;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.util.Pair;
 import org.jgrapht.graph.DefaultWeightedEdge;
+import utils.ServiceUtils;
 
 
 class CNRHelperBehaviour extends Behaviour {
@@ -18,6 +21,11 @@ class CNRHelperBehaviour extends Behaviour {
     private final Pair<String, Boolean> done = Pair.of("done", false);
     private boolean busy = false;
     private int attempts = 0;
+    /**
+     * If a share was agreed
+     */
+    @Setter
+    private boolean agreed = false;
 
     /**
      * Behaviour to create a new ContractNet Responder behaviour
@@ -52,9 +60,24 @@ class CNRHelperBehaviour extends Behaviour {
 
     @Override
     public int onEnd() {
-        busy = false;
-        done.setSecond(false);
-        attempts = 0;
+        var result =  this.agreed ? FSMHumanBehaviour.EVENT_FOUND_SHARE : this.nothingFound();
+        this.reset();
+        return result;
+    }
+
+    @Override
+    public void reset() {
+        this.busy = false;
+        this.done.setSecond(false);
+        this.attempts = 0;
+        this.agreed = false;
+        super.reset();
+    }
+
+    private int nothingFound() {
+        this.fsmHumanBehaviour.setCurrentCarService(ServiceUtils.buildRideName(myAgent.getLocalName()));
+        ServiceUtils.joinService((HumanAgent) this.myAgent, ServiceUtils.buildRideName(this.myAgent.getLocalName()));
+
         return super.onEnd();
     }
 
@@ -74,7 +97,7 @@ class CNRHelperBehaviour extends Behaviour {
 
                     GraphPath<Point, DefaultWeightedEdge> roadPath = GraphUtils.getPathFromAtoB(fsmHumanBehaviour.graph, p1.getName(), p2.getName());
 
-                    Behaviour behaviour = new CarShareContractNetResponder(this.fsmHumanBehaviour, cfp, done, roadPath, fsmHumanBehaviour.graph);
+                    Behaviour behaviour = new CarShareContractNetResponder(this.fsmHumanBehaviour, this, cfp, done, roadPath, fsmHumanBehaviour.graph);
                     busy = true;
                     myAgent.addBehaviour(behaviour);
                 } catch (NoRoadsException e) {

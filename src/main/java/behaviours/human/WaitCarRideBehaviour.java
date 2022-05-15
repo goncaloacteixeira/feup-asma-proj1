@@ -10,14 +10,11 @@ import messages.StringMessages;
  */
 public class WaitCarRideBehaviour extends Behaviour {
 
-    private final FSMHumanBehaviour fsmHumanBehaviour;
-
     private boolean done = false;
 
     public WaitCarRideBehaviour(FSMHumanBehaviour fsmHumanBehaviour) {
         super(fsmHumanBehaviour.getAgent());
 
-        this.fsmHumanBehaviour = fsmHumanBehaviour;
     }
 
     @Override
@@ -46,6 +43,13 @@ public class WaitCarRideBehaviour extends Behaviour {
     @Override
     public int onEnd() {
         System.out.printf("%s: car arrived\n", this.myAgent.getLocalName());
+        this.reset();
         return super.onEnd();
+    }
+
+    @Override
+    public void reset() {
+        this.done = false;
+        super.reset();
     }
 }

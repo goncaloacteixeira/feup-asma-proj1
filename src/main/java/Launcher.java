@@ -38,8 +38,8 @@ public class Launcher {
             Thread.sleep(1000); // time to initialize
 
             Launcher.launchCars(container, 5, 4);
-            // generateMultipleRandomAgents(container);
-            generateTwoAgents(container);
+            generateMultipleRandomAgents(container, 5);
+            //generateTwoAgents(container);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -56,12 +56,12 @@ public class Launcher {
         ac2.start();
     }
 
-    private static void generateMultipleRandomAgents(ContainerController container) throws FileNotFoundException, StaleProxyException {
+    private static void generateMultipleRandomAgents(ContainerController container, int numberAgents) throws FileNotFoundException, StaleProxyException {
         List<Point> points = new ArrayList<>(GraphUtils.importGraph("citygraph.dot").vertexSet().stream().toList());
 
         Random random = new Random();
         List<AgentController> agentControllers = new ArrayList<>();
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= numberAgents; i++) {
             Collections.shuffle(points);
             String p1 = points.get(0).getName();
             String p2 = points.get(1).getName();

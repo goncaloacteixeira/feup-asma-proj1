@@ -24,6 +24,8 @@ class EvaluatePathBehaviour extends OneShotBehaviour {
             return;
         }
 
+        System.out.printf("%s: path size: %d current index: %d\n", this.myAgent.getLocalName(), fsmHumanBehaviour.path.getLength(), fsmHumanBehaviour.currentLocationIndex);
+
         DefaultWeightedEdge edge = fsmHumanBehaviour.path.getEdgeList().get(fsmHumanBehaviour.currentLocationIndex);
 
         if (edge instanceof RoadEdge) {

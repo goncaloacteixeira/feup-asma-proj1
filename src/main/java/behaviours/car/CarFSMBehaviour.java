@@ -45,7 +45,7 @@ public class CarFSMBehaviour extends FSMBehaviour {
         this.registerFirstState(new CarListeningBehaviour(this.myAgent, this), STATE_LISTENING);
         this.registerLastState(new CarEndBehaviour(), STATE_END);
 
-        this.registerState(new CarHoldBehaviour(), STATE_HOLD);
+        this.registerState(new CarHoldBehaviour(this), STATE_HOLD);
         this.registerState(new CarMoveBehaviour(this), STATE_MOVING);
         this.registerState(new CarTransportBehaviour(this), STATE_TRANSPORTING);
 
@@ -57,5 +57,13 @@ public class CarFSMBehaviour extends FSMBehaviour {
         this.registerDefaultTransition(STATE_MOVING, STATE_TRANSPORTING);
         this.registerDefaultTransition(STATE_TRANSPORTING, STATE_END);
         this.registerTransition(STATE_TRANSPORTING, STATE_LISTENING, EVENT_TRAVEL_END);
+    }
+
+    public void removeHuman() {
+        this.currentHuman = null;
+    }
+
+    public boolean hasHuman() {
+        return this.currentHuman != null;
     }
 }

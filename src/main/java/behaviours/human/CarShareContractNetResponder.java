@@ -25,14 +25,16 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
     private final Pair<String, Boolean> done;
     private final GraphPath<Point, DefaultWeightedEdge> roadPath;
     private final FSMHumanBehaviour fsmHumanBehaviour;
+    private final CNRHelperBehaviour cnrHelperBehaviour;
 
-    public CarShareContractNetResponder(FSMHumanBehaviour fsmHumanBehaviour, ACLMessage cfp, Pair<String, Boolean> done, GraphPath<Point, DefaultWeightedEdge> roadPath, Graph<Point, DefaultWeightedEdge> graph) {
+    public CarShareContractNetResponder(FSMHumanBehaviour fsmHumanBehaviour, CNRHelperBehaviour cnrHelperBehaviour, ACLMessage cfp, Pair<String, Boolean> done, GraphPath<Point, DefaultWeightedEdge> roadPath, Graph<Point, DefaultWeightedEdge> graph) {
         super(fsmHumanBehaviour.getAgent(), cfp);
         this.done = done;
         this.roadPath = roadPath;
         this.graph = graph;
 
         this.fsmHumanBehaviour = fsmHumanBehaviour;
+        this.cnrHelperBehaviour = cnrHelperBehaviour;
     }
 
     @Override
@@ -91,6 +93,8 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
         // join the other agent ride service so that the car can communicate with both
         this.fsmHumanBehaviour.setCurrentCarService(ServiceUtils.buildRideName(accept.getSender().getLocalName()));
         ServiceUtils.joinService((HumanAgent) this.myAgent, this.fsmHumanBehaviour.getCurrentCarService());
+
+        this.cnrHelperBehaviour.setAgreed(true);
 
         return inform;
     }
