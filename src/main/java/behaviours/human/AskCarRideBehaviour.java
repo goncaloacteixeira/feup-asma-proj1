@@ -1,5 +1,6 @@
 package behaviours.human;
 
+import agents.HumanAgent;
 import behaviours.car.CarRideContractNetInitiatorBehaviour;
 import graph.GraphUtils;
 import graph.exceptions.NoRoadsException;
@@ -11,17 +12,19 @@ import lombok.Getter;
 import lombok.Setter;
 import messages.CarRideProposeMessage;
 import messages.StringMessages;
+import messages.results.CarService;
+import org.jgrapht.graph.DefaultWeightedEdge;
 
 /**
  * This behaviour is used to ask a car to ride.
- *
+ * <p>
  * It is like an auction, but backwards.
- *   1. The human asks for prices;
- *   2. The cars reply with prices;
- *   3. The human proposes the minimum price to the other cars;
- *   4. Go to step 2 and 3, until there are no more proposals.
+ * 1. The human asks for prices;
+ * 2. The cars reply with prices;
+ * 3. The human proposes the minimum price to the other cars;
+ * 4. Go to step 2 and 3, until there are no more proposals.
  */
-public class AskCarRideBehaviour extends Behaviour{
+public class AskCarRideBehaviour extends Behaviour {
 
     private final FSMHumanBehaviour fsm;
 
@@ -40,7 +43,7 @@ public class AskCarRideBehaviour extends Behaviour{
     /**
      * The price the human is asking for.
      * This is supposed to start as the lowest possible price (the length of the shortest path), and raise by INCREMENT
-     *  until a car accepts the offer.
+     * until a car accepts the offer.
      */
     @Getter
     private float bestValue;
@@ -126,6 +129,21 @@ public class AskCarRideBehaviour extends Behaviour{
         message.setContent(StringMessages.CAR_RIDE_CONFIRMED);
         this.myAgent.send(message);
 
+        /*
+         * Update first edge to include the difference between the best value and the initial cost
+         * if the best value > initial cost, then the edge weight will be higher.
+         */
+        var path = GraphUtils.getPathFromAtoB(fsm.graph, this.start.getName(), this.end.getName());
+        float initialCost = (float) GraphUtils.calculateCost(this.fsm.graph, path);
+        float expected = (float) GraphUtils.calculateCostForHuman(this.fsm.original, path, (HumanAgent) myAgent);
+        for (int i = 0; i < path.getEdgeList().size(); i++) {
+            DefaultWeightedEdge e = path.getEdgeList().get(i);
+            double weight = fsm.graph.getEdgeWeight(e);
+            fsm.graph.setEdgeWeight(e, weight + this.bestValue / path.getEdgeList().size());
+        }
+
+        System.out.printf("%s: Car Service Fare: %.02f\n", myAgent.getLocalName(), (this.bestValue - initialCost));
+        ((HumanAgent) myAgent).informResults(new CarService(myAgent.getLocalName(), path.getVertexList().toString(), (this.bestValue - initialCost), expected));
         this.done = true;
     }
 

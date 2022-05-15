@@ -1,6 +1,4 @@
-import agents.CarAgent;
-import agents.HumanAgent;
-import agents.HumanPreferences;
+import agents.*;
 import graph.GraphUtils;
 import graph.vertex.Point;
 import jade.core.Profile;
@@ -41,6 +39,8 @@ public class Launcher {
             generateMultipleRandomAgents(container, 5);
             //generateTwoAgents(container);
 
+            AgentController results = container.createNewAgent("Results", ResultsAgent.class.getName(), new Object[]{"./results.csv"});
+            results.start();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -50,8 +50,11 @@ public class Launcher {
     private static void generateTwoAgents(ContainerController container) throws StaleProxyException {
         HumanPreferences s1 = new HumanPreferences().carShareInitiator().noSubway();
         HumanPreferences s2 = new HumanPreferences().noStreets();
-        AgentController ac1 = container.createNewAgent("Human1", HumanAgent.class.getName(), new Object[]{"sem1", "sta5", s1});
-        AgentController ac2 = container.createNewAgent("Human2", HumanAgent.class.getName(), new Object[]{"sem1", "sta5", s2});
+
+        EnvironmentPreferences ep = new EnvironmentPreferences(1.1);
+
+        AgentController ac1 = container.createNewAgent("Human1", HumanAgent.class.getName(), new Object[]{"sem1", "sta5", s1, ep});
+        AgentController ac2 = container.createNewAgent("Human2", HumanAgent.class.getName(), new Object[]{"sem1", "sta5", s2, ep});
         ac1.start();
         ac2.start();
     }
@@ -61,13 +64,16 @@ public class Launcher {
 
         Random random = new Random();
         List<AgentController> agentControllers = new ArrayList<>();
+
+        EnvironmentPreferences ep = new EnvironmentPreferences(0.8);
+
         for (int i = 1; i <= numberAgents; i++) {
             Collections.shuffle(points);
             String p1 = points.get(0).getName();
             String p2 = points.get(1).getName();
 
             HumanPreferences settings = new HumanPreferences().carShareInitiator(random.nextDouble() > 0.5);
-            AgentController ac = container.createNewAgent("Human" + i, HumanAgent.class.getName(), new Object[]{p1, p2, settings});
+            AgentController ac = container.createNewAgent("Human" + i, HumanAgent.class.getName(), new Object[]{p1, p2, settings, ep});
             agentControllers.add(ac);
         }
 

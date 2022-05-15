@@ -1,6 +1,7 @@
 package behaviours.human;
 
 import agents.HumanAgent;
+import graph.GraphUtils;
 import graph.RoadPathPoints;
 import graph.vertex.Point;
 import jade.domain.FIPAAgentManagement.FailureException;
@@ -9,6 +10,7 @@ import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import jade.proto.SSContractNetResponder;
+import messages.results.ShareRide;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.util.Pair;
@@ -16,7 +18,10 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import utils.ServiceUtils;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Random;
+import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
 
 import static org.apache.commons.math3.util.Precision.round;
 
@@ -74,13 +79,23 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
          * Contributions are calculated based on contrib value (0.5, 0.3, ...), then a contribution value is
          * calculated based on the original edge weight, for the whole road path
          */
+
+        double original = GraphUtils.calculateCostForHuman(graph, roadPath, (HumanAgent) myAgent);
+
         Double[] contributions = new Double[roadPath.getEdgeList().size()];
+        double afterShare = 0.0;
         for (int i = 0; i < roadPath.getEdgeList().size(); i++) {
             DefaultWeightedEdge e = roadPath.getEdgeList().get(i);
             Double weight = graph.getEdgeWeight(e);
-            graph.setEdgeWeight(e,  weight * contrib);
-            contributions[i] = weight * contrib;
+            var aux = weight * contrib + ((HumanAgent) myAgent).getEnvironmentPreferences().carServiceFare() * weight * contrib;
+            graph.setEdgeWeight(e,  aux);
+            contributions[i] = aux;
+            afterShare += aux;
         }
+
+        ((HumanAgent) myAgent).informResults(new ShareRide(myAgent.getLocalName(), roadPath.getVertexList().toString(), false));
+
+        System.out.printf("%s: Road Path was: %.02f, now: %.02f\n", myAgent.getLocalName(), original, afterShare);
 
         ACLMessage inform = accept.createReply();
         inform.setPerformative(ACLMessage.INFORM);

@@ -8,6 +8,7 @@ import graph.vertex.Point;
 import jade.core.behaviours.FSMBehaviour;
 import lombok.Getter;
 import lombok.Setter;
+import messages.results.PathStart;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -39,6 +40,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
 
     protected int currentLocationIndex = 0;
     protected Graph<Point, DefaultWeightedEdge> graph;
+    protected Graph<Point, DefaultWeightedEdge> original;
     protected GraphPath<Point, DefaultWeightedEdge> path;
     protected HumanPreferences preferences;
 
@@ -51,16 +53,19 @@ public class FSMHumanBehaviour extends FSMBehaviour {
     @Setter
     private String currentCarService;
 
-    public FSMHumanBehaviour(HumanAgent a, Graph<Point, DefaultWeightedEdge> graph, String src, String dst, HumanPreferences preferences) {
-        super(a);
+    public FSMHumanBehaviour(HumanAgent agent, Graph<Point, DefaultWeightedEdge> graph, Graph<Point, DefaultWeightedEdge> original, String src, String dst, HumanPreferences preferences) {
+        super(agent);
         this.graph = graph;
+        this.original = original;
         this.path = GraphUtils.getPathFromAtoB(graph, src, dst);
         this.preferences = preferences;
 
         // Humans either init car share or respond to car sharing when they start a new road travel
         ServiceUtils.joinService((HumanAgent) this.myAgent, preferences.isCarShareInitiator() ? CAR_SHARE_INIT_SERVICE : CAR_SHARE_RESP_SERVICE);
 
+        double cost = GraphUtils.calculateCostForHuman(graph, path, (HumanAgent) myAgent);
         System.out.printf("%s: Path: %s with edges %s (Cost: %.02f)\n", myAgent.getLocalName(), path.getVertexList(), path, path.getWeight());
+        agent.informResults(new PathStart(myAgent.getLocalName(), path.getVertexList().toString(), cost));
 
         this.registerFirstState(new EvaluatePathBehaviour(this), STATE_EVAL);
         this.registerLastState(new DestinationBehaviour(this), STATE_DST);
