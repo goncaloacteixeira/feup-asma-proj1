@@ -1,5 +1,6 @@
 package behaviours.human;
 
+import agents.HumanAgent;
 import behaviours.car.CarRideContractNetInitiatorBehaviour;
 import graph.GraphUtils;
 import graph.exceptions.NoRoadsException;
@@ -10,6 +11,7 @@ import jade.lang.acl.ACLMessage;
 import lombok.Setter;
 import messages.CarRideProposeMessage;
 import messages.StringMessages;
+import messages.results.CarService;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import utils.ServiceUtils;
 
@@ -118,11 +120,15 @@ public class AskCarRideBehaviour extends Behaviour {
          */
         var path = GraphUtils.getPathFromAtoB(fsm.graph, this.start.getName(), this.end.getName());
         float initialCost = (float) GraphUtils.calculateCost(this.fsm.graph, path);
-        DefaultWeightedEdge e = path.getEdgeList().get(0);
-        double weight = fsm.graph.getEdgeWeight(e);
-        fsm.graph.setEdgeWeight(e, weight + (this.bestValue - initialCost));
+        float expected = (float) GraphUtils.calculateCostForHuman(this.fsm.original, path, (HumanAgent) myAgent);
+        for (int i = 0; i < path.getEdgeList().size(); i++) {
+            DefaultWeightedEdge e = path.getEdgeList().get(i);
+            double weight = fsm.graph.getEdgeWeight(e);
+            fsm.graph.setEdgeWeight(e, weight + this.bestValue / path.getEdgeList().size());
+        }
 
         System.out.printf("%s: Car Service Fare: %.02f\n", myAgent.getLocalName(), (this.bestValue - initialCost));
+        ((HumanAgent) myAgent).informResults(new CarService(myAgent.getLocalName(), path.getVertexList().toString(), (this.bestValue - initialCost), expected));
         this.done = true;
     }
 

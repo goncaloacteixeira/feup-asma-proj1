@@ -1,7 +1,4 @@
-import agents.CarAgent;
-import agents.EnvironmentPreferences;
-import agents.HumanAgent;
-import agents.HumanPreferences;
+import agents.*;
 import graph.GraphUtils;
 import graph.vertex.Point;
 import jade.core.Profile;
@@ -42,6 +39,8 @@ public class Launcher {
             // generateMultipleRandomAgents(container);
             generateTwoAgents(container);
 
+            AgentController results = container.createNewAgent("Results", ResultsAgent.class.getName(), new Object[]{"./results.csv"});
+            results.start();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -52,7 +51,7 @@ public class Launcher {
         HumanPreferences s1 = new HumanPreferences().carShareInitiator().noSubway();
         HumanPreferences s2 = new HumanPreferences().noStreets();
 
-        EnvironmentPreferences ep = new EnvironmentPreferences(0.8);
+        EnvironmentPreferences ep = new EnvironmentPreferences(1.1);
 
         AgentController ac1 = container.createNewAgent("Human1", HumanAgent.class.getName(), new Object[]{"sem1", "sta5", s1, ep});
         AgentController ac2 = container.createNewAgent("Human2", HumanAgent.class.getName(), new Object[]{"sem1", "sta5", s2, ep});

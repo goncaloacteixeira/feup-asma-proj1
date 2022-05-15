@@ -1,10 +1,12 @@
 package behaviours.human;
 
+import agents.HumanAgent;
 import graph.vertex.Point;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import jade.proto.ContractNetInitiator;
+import messages.results.ShareRide;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.util.Pair;
@@ -93,6 +95,7 @@ public class CarShareContractNetInitiator extends ContractNetInitiator {
                 double weight = graph.getEdgeWeight(e);
                 graph.setEdgeWeight(e, weight - contributions[i]);
             }
+            ((HumanAgent) myAgent).informResults(new ShareRide(myAgent.getLocalName(), roadPath.getVertexList().toString(), true));
         } catch (UnreadableException e) {
             throw new RuntimeException(e);
         }

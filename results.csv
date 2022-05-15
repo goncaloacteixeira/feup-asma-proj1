@@ -1,0 +1,3 @@
+"name","path","original_cost","final_cost","shared_segments","car_service_fares"
+"Human1","[sem1, sem3, sta4, sta5]","31.0","21.733939743041994","[Path: [sem1, sem3, sta4], Initiator: true]","[Path: [sem1, sem3, sta4], Fare: 8,53, Expected: 3,36]"
+"Human2","[sem1, sem3, sta4, sta6, sta5]","25.0","12.4","[Path: [sem1, sem3, sta4], Initiator: false]","[]"

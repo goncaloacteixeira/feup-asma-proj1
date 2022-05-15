@@ -10,6 +10,7 @@ import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import jade.proto.SSContractNetResponder;
+import messages.results.ShareRide;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.util.Pair;
@@ -89,6 +90,8 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
             contributions[i] = aux;
             afterShare += aux;
         }
+
+        ((HumanAgent) myAgent).informResults(new ShareRide(myAgent.getLocalName(), roadPath.getVertexList().toString(), false));
 
         System.out.printf("%s: Road Path was: %.02f, now: %.02f\n", myAgent.getLocalName(), original, afterShare);
 

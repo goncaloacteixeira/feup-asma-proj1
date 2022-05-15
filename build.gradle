@@ -21,6 +21,7 @@ dependencies {
 
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+    implementation(group: 'com.opencsv', name: 'opencsv', version: '4.1')
 }
 
 test {

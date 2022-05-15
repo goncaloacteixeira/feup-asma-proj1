@@ -14,10 +14,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public interface ServiceUtils {
-
     String HUMAN_BROADCAST = "human-broadcast-service";
-
     String CAR_RIDE = "available-car-ride-service";
+    String HUMAN_RESULTS = "human-results-service";
 
     static DFAgentDescription registerDF(Agent agent) {
         DFAgentDescription dfd = new DFAgentDescription();
