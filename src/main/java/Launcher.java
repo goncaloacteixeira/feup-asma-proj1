@@ -35,9 +35,9 @@ public class Launcher {
         try {
             Thread.sleep(1000); // time to initialize
 
-            Launcher.launchCars(container, 5, 4);
-            // generateMultipleRandomAgents(container);
-            generateTwoAgents(container);
+            Launcher.launchCars(container, 10, 4);
+            generateMultipleRandomAgents(container);
+            // generateTwoAgents(container);
 
             AgentController results = container.createNewAgent("Results", ResultsAgent.class.getName(), new Object[]{"./results.csv"});
             results.start();
