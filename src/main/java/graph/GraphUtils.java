@@ -1,5 +1,6 @@
 package graph;
 
+import agents.HumanAgent;
 import graph.edge.Edge;
 import graph.edge.RoadEdge;
 import graph.edge.StreetEdge;
@@ -255,5 +256,17 @@ public class GraphUtils {
      */
     public static boolean isAdjacent(Graph<Point, DefaultWeightedEdge> graph, Point a, Point b) {
         return graph.containsEdge(a, b);
+    }
+
+    public static double calculateCostForHuman(Graph<Point, DefaultWeightedEdge> graph, GraphPath<Point, DefaultWeightedEdge> path, HumanAgent agent) {
+        double cost = 0.0;
+        for (DefaultWeightedEdge e : path.getEdgeList()) {
+            if (e instanceof RoadEdge) {
+                cost += graph.getEdgeWeight(e) + graph.getEdgeWeight(e) * agent.getEnvironmentPreferences().carServiceFare();
+            } else {
+                cost += graph.getEdgeWeight(e);
+            }
+        }
+        return cost;
     }
 }

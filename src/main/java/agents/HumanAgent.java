@@ -19,6 +19,7 @@ public class HumanAgent extends SubscribableAgent {
     private String srcPoint;
     private String dstPoint;
     private HumanPreferences settings;
+    private EnvironmentPreferences environmentPreferences;
 
     @Getter
     @Setter
@@ -31,9 +32,10 @@ public class HumanAgent extends SubscribableAgent {
     @Override
     protected void setup() {
         Object[] args = this.getArguments();
-        this.srcPoint = (String) args[0];               // Source Point for Travel
-        this.dstPoint = (String) args[1];               // Destiny Point for Travel
-        this.settings = (HumanPreferences) args[2];     // Preferences (weights and initiators)
+        this.srcPoint = (String) args[0];                               // Source Point for Travel
+        this.dstPoint = (String) args[1];                               // Destiny Point for Travel
+        this.settings = (HumanPreferences) args[2];                     // Preferences (weights and initiators)
+        this.environmentPreferences = (EnvironmentPreferences) args[3]; // Environment Variables
 
         // join DF service
         this.agentDescription = ServiceUtils.registerDF(this);
@@ -51,6 +53,10 @@ public class HumanAgent extends SubscribableAgent {
 
     public void informMovement(String message) {
         addBehaviour(new BroadcastBehaviour(this, ACLMessage.INFORM, message, this.broadcastService));
+    }
+
+    public EnvironmentPreferences getEnvironmentPreferences() {
+        return environmentPreferences;
     }
 
     @Override

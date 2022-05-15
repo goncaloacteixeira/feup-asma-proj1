@@ -59,7 +59,8 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         // Humans either init car share or respond to car sharing when they start a new road travel
         ServiceUtils.joinService((HumanAgent) this.myAgent, preferences.isCarShareInitiator() ? CAR_SHARE_INIT_SERVICE : CAR_SHARE_RESP_SERVICE);
 
-        System.out.printf("%s: Path: %s (Cost: %.02f)\n", myAgent.getLocalName(), path.getVertexList(), path.getWeight());
+        double cost = GraphUtils.calculateCostForHuman(graph, path, (HumanAgent) myAgent);
+        System.out.printf("%s: Path: %s (Cost: %.02f)\n", myAgent.getLocalName(), path.getVertexList(), cost);
 
         this.registerFirstState(new EvaluatePathBehaviour(this), STATE_EVAL);
         this.registerLastState(new DestinationBehaviour(this), STATE_DST);
