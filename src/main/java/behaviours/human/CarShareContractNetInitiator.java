@@ -120,11 +120,10 @@ public class CarShareContractNetInitiator extends ContractNetInitiator {
 
     protected void handleInform(ACLMessage inform) {
         System.out.printf("%s: %s completed ContractNet\n", myAgent.getLocalName(), inform.getSender().getLocalName());
-        try {
-            /*
-             * Decrement weight based on contributions. The INFORM message has a double[] containing the
-             * contributions from the proposer
-             */
+        /*try {
+
+             // Decrement weight based on contributions. The INFORM message has a double[] containing the
+             // contributions from the proposer
             Double[] contributions = (Double[]) inform.getContentObject();
             for (int i = 0; i < roadPath.getEdgeList().size(); i++) {
                 DefaultWeightedEdge e = roadPath.getEdgeList().get(i);
@@ -136,7 +135,8 @@ public class CarShareContractNetInitiator extends ContractNetInitiator {
             ((HumanAgent) myAgent).informResults(new ShareRide(myAgent.getLocalName(), roadPath.getVertexList().toString(), true));
         } catch (UnreadableException e) {
             throw new RuntimeException(e);
-        }
+        }*/
+        ((HumanAgent) myAgent).informResults(new ShareRide(myAgent.getLocalName(), roadPath.getVertexList().toString(), true));
     }
 
     @Override

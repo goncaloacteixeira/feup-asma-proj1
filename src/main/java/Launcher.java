@@ -7,6 +7,8 @@ import jade.core.Runtime;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -36,8 +38,8 @@ public class Launcher {
             Thread.sleep(1000); // time to initialize
 
             Launcher.launchCars(container, 5, 4);
-            //generateMultipleRandomAgents(container, 5);
-            generateTwoAgents(container);
+            generateMultipleRandomAgents(container, 20);
+            //generateTwoAgents(container);
 
             AgentController results = container.createNewAgent("Results", ResultsAgent.class.getName(), new Object[]{"./results.csv"});
             results.start();
@@ -51,7 +53,7 @@ public class Launcher {
         HumanPreferences s1 = new HumanPreferences().carShareInitiator().noSubway();
         HumanPreferences s2 = new HumanPreferences().noStreets();
 
-        EnvironmentPreferences ep = new EnvironmentPreferences(1.1);
+        EnvironmentPreferences ep = new EnvironmentPreferences(3.5);
 
         AgentController ac1 = container.createNewAgent("Human1", HumanAgent.class.getName(), new Object[]{"sem1", "sta5", s1, ep});
         AgentController ac2 = container.createNewAgent("Human2", HumanAgent.class.getName(), new Object[]{"sem1", "sta5", s2, ep});
@@ -65,12 +67,19 @@ public class Launcher {
         Random random = new Random();
         List<AgentController> agentControllers = new ArrayList<>();
 
-        EnvironmentPreferences ep = new EnvironmentPreferences(0.8);
+        EnvironmentPreferences ep = new EnvironmentPreferences(3.5);
 
         for (int i = 1; i <= numberAgents; i++) {
             Collections.shuffle(points);
             String p1 = points.get(0).getName();
             String p2 = points.get(1).getName();
+
+            Graph<Point, DefaultWeightedEdge> graph = GraphUtils.importGraph("citygraph.dot");
+            var path = GraphUtils.getPathFromAtoB(graph, p1, p2);
+            if (path.getVertexList().size() <= 4) {
+                i--;
+                continue;
+            }
 
             HumanPreferences settings = new HumanPreferences().carShareInitiator(random.nextDouble() > 0.5);
             AgentController ac = container.createNewAgent("Human" + i, HumanAgent.class.getName(), new Object[]{p1, p2, settings, ep});

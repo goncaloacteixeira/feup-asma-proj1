@@ -90,15 +90,15 @@ public class CarShareContractNetResponder extends SSIteratedContractNetResponder
          * calculated based on the original edge weight, for the whole road path
          */
 
-        double original = GraphUtils.calculateCostForHuman(graph, roadPath, (HumanAgent) myAgent);
+        double original = GraphUtils.calculateCost(graph, roadPath);
 
         Double[] contributions = new Double[roadPath.getEdgeList().size()];
         double afterShare = 0.0;
         for (int i = 0; i < roadPath.getEdgeList().size(); i++) {
             DefaultWeightedEdge e = roadPath.getEdgeList().get(i);
-            Double weight = graph.getEdgeWeight(e);
+            double weight = graph.getEdgeWeight(e);
             //var aux = weight * this.myPercentage + ((HumanAgent) myAgent).getEnvironmentPreferences().carServiceFare() * weight * this.myPercentage;
-            var aux = weight * this.myPercentage;
+            var aux = weight * this.myPercentage + weight * ((HumanAgent) myAgent).getEnvironmentPreferences().carServiceFare();
             System.out.printf("%s: Contribution: %.02f\n", myAgent.getLocalName(), aux);
             graph.setEdgeWeight(e,  aux);
             contributions[i] = aux;
