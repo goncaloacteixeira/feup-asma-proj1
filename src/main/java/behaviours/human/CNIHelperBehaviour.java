@@ -2,13 +2,13 @@ package behaviours.human;
 
 import agents.HumanAgent;
 import graph.GraphUtils;
-import graph.RoadPathPoints;
 import graph.exceptions.NoRoadsException;
 import graph.vertex.Point;
 import jade.core.behaviours.Behaviour;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
+import messages.CarShareFullProposalMessage;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.util.Pair;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -38,7 +38,7 @@ class CNIHelperBehaviour extends Behaviour {
     @Override
     public void onStart() {
         try {
-            // creates the service for everyone in the ride (including the car) to join
+            // creates the service for everyone in the ride to join
             this.fsmHumanBehaviour.setCurrentCarService(ServiceUtils.buildRideName(myAgent.getLocalName()));
             ServiceUtils.joinService((HumanAgent) this.myAgent, this.fsmHumanBehaviour.getCurrentCarService());
 
@@ -91,9 +91,9 @@ class CNIHelperBehaviour extends Behaviour {
                 Point p2 = GraphUtils.roadStop(fsmHumanBehaviour.graph, fsmHumanBehaviour.path, fsmHumanBehaviour.currentLocationIndex);
                 GraphPath<Point, DefaultWeightedEdge> roadPath = GraphUtils.getPathFromAtoB(fsmHumanBehaviour.graph, p1.getName(), p2.getName());
 
-                cfp.setContentObject(new RoadPathPoints(p1.getName(), p2.getName()));
+                cfp.setContentObject(new CarShareFullProposalMessage(p1.getName(), p2.getName(), 0.95)); // TODO constant
 
-                Behaviour behaviour = new CarShareContractNetInitiator(myAgent, cfp, agents.size(), done, roadPath, fsmHumanBehaviour.graph);
+                Behaviour behaviour = new CarShareContractNetInitiator(myAgent, cfp, agents.size(), done, roadPath, fsmHumanBehaviour.graph, p1.getName(), p2.getName());
                 busy = true;
                 myAgent.addBehaviour(behaviour);
             } catch (NoRoadsException | IOException e) {

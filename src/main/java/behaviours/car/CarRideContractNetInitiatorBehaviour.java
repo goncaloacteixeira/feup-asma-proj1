@@ -91,6 +91,7 @@ public class CarRideContractNetInitiatorBehaviour extends ContractNetInitiator {
         });
         System.out.printf("%s: sending to %d cars\n", this.myAgent.getLocalName(), totalCars.size());
 
+        cfp.setReplyByDate(new Date(System.currentTimeMillis() + 20000)); // waits 20 seconds for cars to respond
         v.addElement(cfp);
         return v;
     }

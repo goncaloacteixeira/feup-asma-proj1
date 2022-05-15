@@ -1,6 +1,3 @@
 "name","path","original_cost","final_cost","shared_segments","car_service_fares"
-"Human1","[sta5, sta6, sem7, sem8]","20.0","50.0894775390625","[]","[Path: [sta6, sem7, sem8], Fare: 28.09, Expected: 18.00]"
-"Human2","[sem7, sta6]","9.0","21.67506217956543","[]","[Path: [sem7, sta6], Fare: 11.68, Expected: 9.00]"
-"Human3","[sta4, sem3]","9.0","48.372703552246094","[]","[Path: [sta4, sem3], Fare: 38.37, Expected: 9.00]"
-"Human4","[sta2, sta1, sta3, sem6]","22.0","65.05461502075195","[]","[Path: [sta3, sem6], Fare: 41.05, Expected: 18.00]"
-"Human5","[pnt1, sta1, sta3, sta4, sta6, sta5]","18.0","18.0","[]","[]"
+"Human1","[sem1, sem3, sta4, sta5]","31.0","29.988258361816406","[Path: [sem1, sem3, sta4], Initiator: true]","[Path: [sem1, sem3, sta4], Fare: 14.99, Expected: 5.25]"
+"Human2","[sem1, sem3, sta4, sta6, sta5]","25.0","11.5","[Path: [sem1, sem3, sta4], Initiator: false]","[]"

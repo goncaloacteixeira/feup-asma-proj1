@@ -2,14 +2,14 @@ package behaviours.human;
 
 import agents.HumanAgent;
 import graph.GraphUtils;
-import graph.RoadPathPoints;
 import graph.vertex.Point;
 import jade.domain.FIPAAgentManagement.FailureException;
 import jade.domain.FIPAAgentManagement.NotUnderstoodException;
 import jade.domain.FIPAAgentManagement.RefuseException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
-import jade.proto.SSContractNetResponder;
+import jade.proto.SSIteratedContractNetResponder;
+import messages.CarShareFullProposalMessage;
 import messages.results.ShareRide;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
@@ -18,19 +18,18 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import utils.ServiceUtils;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Random;
-import java.util.stream.DoubleStream;
-import java.util.stream.Stream;
 
 import static org.apache.commons.math3.util.Precision.round;
 
-public class CarShareContractNetResponder extends SSContractNetResponder {
+public class CarShareContractNetResponder extends SSIteratedContractNetResponder {
     private final Graph<Point, DefaultWeightedEdge> graph;
     private final Pair<String, Boolean> done;
     private final GraphPath<Point, DefaultWeightedEdge> roadPath;
     private final FSMHumanBehaviour fsmHumanBehaviour;
     private final CNRHelperBehaviour cnrHelperBehaviour;
+    private double theirPercentage = 0.95;
+    private double myPercentage = 0.05;
 
     public CarShareContractNetResponder(FSMHumanBehaviour fsmHumanBehaviour, CNRHelperBehaviour cnrHelperBehaviour, ACLMessage cfp, Pair<String, Boolean> done, GraphPath<Point, DefaultWeightedEdge> roadPath, Graph<Point, DefaultWeightedEdge> graph) {
         super(fsmHumanBehaviour.getAgent(), cfp);
@@ -44,9 +43,9 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
 
     @Override
     protected ACLMessage handleCfp(ACLMessage cfp) throws NotUnderstoodException, RefuseException {
-        RoadPathPoints pathPoints;
+        CarShareFullProposalMessage pathPoints;
         try {
-            pathPoints = (RoadPathPoints) cfp.getContentObject();
+            pathPoints = (CarShareFullProposalMessage) cfp.getContentObject();
             System.out.printf("%s: CFP(%s): %s\n", myAgent.getLocalName(), cfp.getSender().getLocalName(), pathPoints);
         } catch (UnreadableException e) {
             throw new NotUnderstoodException("wrong-class");
@@ -59,21 +58,32 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
             return refusal;
         }
 
-        double proposal = new Random().nextGaussian(0.4, 0.1);
-        proposal = round(proposal, 1);
+        // gets their proposal
+        double theirProposal = pathPoints.getPercentage();
 
-        System.out.printf("%s: Proposing: %.02f\n", myAgent.getLocalName(), proposal);
+        // if their proposal is max, we do our shot
+        // calculates their decrease
+        double theirDecrease = theirPercentage - theirProposal;
+
+        if (theirDecrease <= 0) {
+            this.myPercentage = new Random().nextGaussian(0.2, 0.2);
+            this.myPercentage = round(this.myPercentage, 1);
+        } else {
+            // else we tip for that
+            this.myPercentage += theirDecrease;
+        }
+
+        System.out.printf("%s: Proposing: %.02f\n", myAgent.getLocalName(), this.myPercentage);
 
         ACLMessage propose = cfp.createReply();
         propose.setPerformative(ACLMessage.PROPOSE);
-        propose.setContent(String.valueOf(proposal));
+        propose.setContent(String.valueOf(this.myPercentage));
         return propose;
     }
 
     @Override
     protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) throws FailureException {
         System.out.printf("%s: Proposal Accepted\n", myAgent.getLocalName());
-        Double contrib = Double.valueOf(propose.getContent());
 
         /*
          * Contributions are calculated based on contrib value (0.5, 0.3, ...), then a contribution value is
@@ -87,7 +97,9 @@ public class CarShareContractNetResponder extends SSContractNetResponder {
         for (int i = 0; i < roadPath.getEdgeList().size(); i++) {
             DefaultWeightedEdge e = roadPath.getEdgeList().get(i);
             Double weight = graph.getEdgeWeight(e);
-            var aux = weight * contrib + ((HumanAgent) myAgent).getEnvironmentPreferences().carServiceFare() * weight * contrib;
+            //var aux = weight * this.myPercentage + ((HumanAgent) myAgent).getEnvironmentPreferences().carServiceFare() * weight * this.myPercentage;
+            var aux = weight * this.myPercentage;
+            System.out.printf("%s: Contribution: %.02f\n", myAgent.getLocalName(), aux);
             graph.setEdgeWeight(e,  aux);
             contributions[i] = aux;
             afterShare += aux;

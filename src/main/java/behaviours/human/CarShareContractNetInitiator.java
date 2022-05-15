@@ -6,13 +6,14 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import jade.proto.ContractNetInitiator;
+import messages.CarShareFullProposalMessage;
 import messages.results.ShareRide;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.util.Pair;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
-import java.util.Enumeration;
+import java.io.IOException;
 import java.util.Vector;
 
 public class CarShareContractNetInitiator extends ContractNetInitiator {
@@ -20,13 +21,20 @@ public class CarShareContractNetInitiator extends ContractNetInitiator {
     private final Graph<Point, DefaultWeightedEdge> graph;
     private int nResponders;
     private final GraphPath<Point, DefaultWeightedEdge> roadPath;
+    private final String start;
+    private final String end;
 
-    public CarShareContractNetInitiator(Agent a, ACLMessage cfp, int nResponders, Pair<String, Boolean> done, GraphPath<Point, DefaultWeightedEdge> roadPath, Graph<Point, DefaultWeightedEdge> graph) {
+    private double myPercentage = 0.95;
+    private double theirPercentage = 0.05;
+
+    public CarShareContractNetInitiator(Agent a, ACLMessage cfp, int nResponders, Pair<String, Boolean> done, GraphPath<Point, DefaultWeightedEdge> roadPath, Graph<Point, DefaultWeightedEdge> graph, String p1, String p2) {
         super(a, cfp);
         this.nResponders = nResponders;
         this.done = done;
         this.roadPath = roadPath;
         this.graph = graph;
+        this.start = p1;
+        this.end = p2;
     }
 
     protected void handlePropose(ACLMessage propose, Vector v) {
@@ -55,29 +63,57 @@ public class CarShareContractNetInitiator extends ContractNetInitiator {
             System.out.println("Timeout expired: missing " + (nResponders - responses.size()) + " responses");
         }
 
-        /*
-         * Evaluate Proposal
-         * - threshold: max acceptable contributions from proposers
-         * - current: current contributions from proposers
-         *
-         * While the current does not reach threshold, we accept proposals.
-         * TODO - account for car capacity, add a new field to this class after uber find behaviour @marcio
-         */
-        double current = 0.0;
-        double threshold = 0.9;
-        Enumeration e = responses.elements();
-        while (e.hasMoreElements()) {
-            ACLMessage msg = (ACLMessage) e.nextElement();
-            if (msg.getPerformative() == ACLMessage.PROPOSE) {
-                ACLMessage reply = msg.createReply();
-                double proposal = Double.parseDouble(msg.getContent());
-                if (current + proposal < threshold) {
-                    current += proposal;
-                    reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+        // gets the reply with the best proposal
+        ACLMessage bestReply = null;
+        double bestProposal = 0;
+        for (var response : responses) {
+            ACLMessage message = (ACLMessage) response;
+            if (message.getPerformative() == ACLMessage.PROPOSE) {
+                // for all propose messages, starts with a negative reply, sets the positive reply for negotiation at the end
+                ACLMessage reply = message.createReply();
+                reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
+
+                // gets the value proposed
+                double proposal = Double.parseDouble(message.getContent());
+
+                // updates if so
+                if (bestReply == null || proposal > bestProposal) {
+                    // puts the last best reply in the list of accepted ones
+                    if (bestReply != null) {
+                        acceptances.addElement(bestReply);
+                    }
+                    bestReply = reply;
+                    bestProposal = proposal;
                 } else {
-                    reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
+                    acceptances.addElement(reply);
                 }
-                acceptances.addElement(reply);
+            }
+        }
+
+        // puts the best reply in the list
+        if (bestReply != null) {
+            // gets their raise
+            double theirRaise = bestProposal - this.theirPercentage;
+            this.theirPercentage = bestProposal;
+            System.out.printf("%s: got a raise of %f\n", myAgent.getLocalName(), theirRaise);
+
+            // updates our value tip for tat
+            this.myPercentage -= theirRaise;
+            if (this.myPercentage < this.theirPercentage) {
+                // accepts
+                bestReply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+                acceptances.addElement(bestReply);
+            } else {
+                bestReply.setPerformative(ACLMessage.CFP);
+                try {
+                    bestReply.setContentObject(new CarShareFullProposalMessage(this.start, this.end, this.myPercentage));
+                } catch (IOException e) {
+                    // won't happen
+                    throw new RuntimeException(e);
+                }
+                acceptances.addElement(bestReply);
+
+                this.newIteration(acceptances);
             }
         }
     }
@@ -93,7 +129,9 @@ public class CarShareContractNetInitiator extends ContractNetInitiator {
             for (int i = 0; i < roadPath.getEdgeList().size(); i++) {
                 DefaultWeightedEdge e = roadPath.getEdgeList().get(i);
                 double weight = graph.getEdgeWeight(e);
-                graph.setEdgeWeight(e, weight - contributions[i]);
+                var newTot = weight - contributions[i];
+                System.out.printf("%s: %f - %f = %f\n", myAgent.getLocalName(), weight, contributions[i], newTot);
+                graph.setEdgeWeight(e, newTot);
             }
             ((HumanAgent) myAgent).informResults(new ShareRide(myAgent.getLocalName(), roadPath.getVertexList().toString(), true));
         } catch (UnreadableException e) {
