@@ -2,6 +2,7 @@ package agents;
 
 import behaviours.BroadcastBehaviour;
 import behaviours.human.FSMHumanBehaviour;
+import com.opencsv.CSVWriter;
 import graph.GraphUtils;
 import graph.vertex.Point;
 import jade.core.behaviours.OneShotBehaviour;
@@ -14,16 +15,23 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import utils.ServiceUtils;
 
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Serializable;
+import java.util.Date;
 import java.util.Set;
+
+
 
 public class HumanAgent extends SubscribableAgent {
     private final String broadcastService;
     private String srcPoint;
     private String dstPoint;
+    @Getter
     private HumanPreferences settings;
     private EnvironmentPreferences environmentPreferences;
+    @Getter
+    @Setter
+    private HumanResults results;
 
     @Getter
     @Setter
@@ -44,6 +52,8 @@ public class HumanAgent extends SubscribableAgent {
         // join DF service
         this.agentDescription = ServiceUtils.registerDF(this);
 
+
+
         try {
             // for each agent we need to import a new graph since weights vary from agent to agent
             Graph<Point, DefaultWeightedEdge> graph = GraphUtils.importGraph("citygraph.dot", settings.streetWeight, settings.roadWeight, settings.subwayWeight);
@@ -56,15 +66,30 @@ public class HumanAgent extends SubscribableAgent {
         }
     }
 
-    public void informMovement(String message) {
-        addBehaviour(new BroadcastBehaviour(this, ACLMessage.INFORM, message, this.broadcastService));
-    }
-
-    public void informResults(Serializable content) {
+    public void informResults() {
         addBehaviour(new OneShotBehaviour() {
             @Override
             public void action() {
-                Set<DFAgentDescription> agents = ServiceUtils.search(this.myAgent, ServiceUtils.HUMAN_RESULTS);
+                FileWriter outputfile = null;
+                try {
+                    outputfile = new FileWriter(String.format("./results/%s-results-%s.csv", myAgent.getLocalName(), new Date().getTime()));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                var writer = new CSVWriter(outputfile);
+
+                String[] header = {"name", "path", "initiator", "original_cost", "final_cost", "shared_segments", "car_service_fares", "num_shared_segments", "num_car_service_fares"};
+                writer.writeNext(header);
+
+                writer.writeNext(results.valuesToWrite());
+
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                /*Set<DFAgentDescription> agents = ServiceUtils.search(this.myAgent, ServiceUtils.HUMAN_RESULTS);
 
                 ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
                 for (DFAgentDescription agent : agents) {
@@ -72,12 +97,12 @@ public class HumanAgent extends SubscribableAgent {
                 }
 
                 try {
-                    msg.setContentObject(content);
+                    msg.setContentObject(results);
                 } catch (IOException e) {
                     System.err.println(e.getMessage());
                 }
 
-                this.myAgent.send(msg);
+                this.myAgent.send(msg);*/
             }
         });
     }

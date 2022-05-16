@@ -1,6 +1,8 @@
 package behaviours.human;
 
+import agents.CarServiceFare;
 import agents.HumanAgent;
+import agents.SharedSegment;
 import behaviours.car.CarRideContractNetInitiatorBehaviour;
 import graph.GraphUtils;
 import graph.exceptions.NoRoadsException;
@@ -51,6 +53,9 @@ public class AskCarRideBehaviour extends Behaviour {
     @Getter
     private AID bestCar;
 
+    @Setter
+    private boolean foundCar = false;
+
     public AskCarRideBehaviour(FSMHumanBehaviour fsmHumanBehaviour) {
         super(fsmHumanBehaviour.getAgent());
         this.fsm = fsmHumanBehaviour;
@@ -86,11 +91,16 @@ public class AskCarRideBehaviour extends Behaviour {
         this.bestCar = null;
         this.isDiscussing = false;
         this.done = false;
+        this.foundCar = false;
         super.reset();
     }
 
     @Override
     public int onEnd() {
+        if (this.foundCar) {
+            this.reset();
+            return FSMHumanBehaviour.EVENT_FOUND_CAR;
+        }
         this.reset();
         return super.onEnd();
     }
@@ -143,7 +153,14 @@ public class AskCarRideBehaviour extends Behaviour {
         }
 
         System.out.printf("%s: Car Service Fare: %.02f\n", myAgent.getLocalName(), (this.bestValue - initialCost));
-        ((HumanAgent) myAgent).informResults(new CarService(myAgent.getLocalName(), path.getVertexList().toString(), (this.bestValue - initialCost), expected));
+        ((HumanAgent) myAgent).getResults().addCarServiceFare(new CarServiceFare(path.getVertexList().toString(), (this.bestValue - initialCost), expected));
+        // ((HumanAgent) myAgent).informResults(new CarService(myAgent.getLocalName(), path.getVertexList().toString(), (this.bestValue - initialCost), expected));
+
+        this.foundCar = true;
+        this.done = true;
+    }
+
+    public void foundNoCars() {
         this.done = true;
     }
 

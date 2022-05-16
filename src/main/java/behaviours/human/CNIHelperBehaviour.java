@@ -20,7 +20,7 @@ import java.util.Set;
 
 class CNIHelperBehaviour extends Behaviour {
     private final FSMHumanBehaviour fsmHumanBehaviour;
-    private final String service;
+    private String service;
     private final Pair<String, Boolean> done = Pair.of("done", false);
     private boolean busy = false;
 
@@ -32,7 +32,6 @@ class CNIHelperBehaviour extends Behaviour {
     public CNIHelperBehaviour(FSMHumanBehaviour fsmHumanBehaviour) {
         super(fsmHumanBehaviour.getAgent());
         this.fsmHumanBehaviour = fsmHumanBehaviour;
-        this.service = FSMHumanBehaviour.CAR_SHARE_RESP_SERVICE;
     }
 
     @Override
@@ -44,6 +43,9 @@ class CNIHelperBehaviour extends Behaviour {
 
             Point p1 = fsmHumanBehaviour.path.getVertexList().get(fsmHumanBehaviour.currentLocationIndex);
             Point p2 = GraphUtils.roadStop(fsmHumanBehaviour.graph, fsmHumanBehaviour.path, fsmHumanBehaviour.currentLocationIndex);
+
+            this.service = ServiceUtils.buildShareName(p1.getName(), p2.getName());
+
             System.out.printf("%s: Announcing Car Share from %s to %s\n", myAgent.getLocalName(), p1, p2);
         } catch (NoRoadsException e) {
             throw new RuntimeException(e);
@@ -82,6 +84,11 @@ class CNIHelperBehaviour extends Behaviour {
             cfp.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
             cfp.setContent("dummy-action");
 
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             Set<DFAgentDescription> agents = ServiceUtils.search(myAgent, service);
 
             agents.forEach(agent -> cfp.addReceiver(agent.getName()));

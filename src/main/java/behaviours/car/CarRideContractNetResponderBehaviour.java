@@ -70,7 +70,7 @@ public class CarRideContractNetResponderBehaviour extends ContractNetResponder {
 
     @Override
     protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject) {
-        // TODO
+        this.fsm.removeHuman();
         System.out.printf("%s: Proposal rejected.\n", myAgent.getLocalName());
 
         this.carListeningBehaviour.restart();
@@ -84,18 +84,19 @@ public class CarRideContractNetResponderBehaviour extends ContractNetResponder {
     @Override
     protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) {
         this.fsm.setCurrentPath(this.path);
-        this.fsm.setCurrentHuman(accept.getSender());
 
         ACLMessage reply = accept.createReply();
         reply.setPerformative(ACLMessage.INFORM);
         System.out.printf("%s: Proposal from %s accepted.\n", myAgent.getLocalName(), accept.getSender().getLocalName());
 
-        this.carListeningBehaviour.setDone(true);
         this.carListeningBehaviour.setOnHold(true);
+        this.carListeningBehaviour.setDone(true);
         return reply;
     }
 
     private ACLMessage handleBlindRequest(ACLMessage cfp, CarRideCFPBlindRequestMessage message) throws IOException {
+        this.fsm.setCurrentHuman(cfp.getSender());
+
         this.path = GraphUtils.getRoadPathFromAtoB(((CarAgent) this.carListeningBehaviour.getAgent()).getGraph(), message.getStart().getName(), message.getEnd().getName());
 
         double totalCost = this.getTotalCost(message.getStart());
@@ -113,6 +114,8 @@ public class CarRideContractNetResponderBehaviour extends ContractNetResponder {
     }
 
     private ACLMessage handlePriceRequest(ACLMessage cfp, CarRideCFPRequestMessage message) throws IOException {
+        this.fsm.setCurrentHuman(cfp.getSender());
+
         this.path = GraphUtils.getRoadPathFromAtoB(((CarAgent) this.carListeningBehaviour.getAgent()).getGraph(), message.getStart().getName(), message.getEnd().getName());
 
         double totalCost = this.getTotalCost(message.getStart());

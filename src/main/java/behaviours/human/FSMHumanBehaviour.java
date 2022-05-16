@@ -1,5 +1,6 @@
 package behaviours.human;
 
+import agents.HumanResults;
 import agents.HumanAgent;
 import agents.HumanPreferences;
 import graph.GraphUtils;
@@ -8,11 +9,9 @@ import graph.vertex.Point;
 import jade.core.behaviours.FSMBehaviour;
 import lombok.Getter;
 import lombok.Setter;
-import messages.results.PathStart;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
-import utils.ServiceUtils;
 
 public class FSMHumanBehaviour extends FSMBehaviour {
     static String STATE_EVAL = "EVAL";
@@ -34,9 +33,7 @@ public class FSMHumanBehaviour extends FSMBehaviour {
     static int EVENT_FAIL = 5;
     static int EVENT_CAR_END = 6; // for when the car travel reaches the destination
     static int EVENT_FOUND_SHARE = 7;
-
-    public final static String CAR_SHARE_INIT_SERVICE = "car-share-initiators";
-    public final static String CAR_SHARE_RESP_SERVICE = "car-share-responders";
+    static int EVENT_FOUND_CAR = 8;
 
     protected int currentLocationIndex = 0;
     protected Graph<Point, DefaultWeightedEdge> graph;
@@ -60,12 +57,11 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         this.path = GraphUtils.getPathFromAtoB(graph, src, dst);
         this.preferences = preferences;
 
-        // Humans either init car share or respond to car sharing when they start a new road travel
-        ServiceUtils.joinService((HumanAgent) this.myAgent, preferences.isCarShareInitiator() ? CAR_SHARE_INIT_SERVICE : CAR_SHARE_RESP_SERVICE);
-
         double cost = GraphUtils.calculateCostForHuman(graph, path, (HumanAgent) myAgent);
         System.out.printf("%s: Path: %s with edges %s (Cost: %.02f)\n", myAgent.getLocalName(), path.getVertexList(), path, path.getWeight());
-        agent.informResults(new PathStart(myAgent.getLocalName(), path.getVertexList().toString(), cost));
+
+        agent.setResults(new HumanResults(myAgent.getLocalName(), path.getVertexList().toString(), cost, agent.getSettings().isCarShareInitiator()));
+        // agent.informResults(new PathStart(myAgent.getLocalName(), path.getVertexList().toString(), cost, ((HumanAgent) myAgent).getSettings().isCarShareInitiator()));
 
         this.registerFirstState(new EvaluatePathBehaviour(this), STATE_EVAL);
         this.registerLastState(new DestinationBehaviour(this), STATE_DST);
@@ -89,7 +85,8 @@ public class FSMHumanBehaviour extends FSMBehaviour {
         this.registerDefaultTransition(STATE_CNI, STATE_RID); // after taking care of car sharing, ask for car ride
         this.registerDefaultTransition(STATE_CNR, STATE_RID); // if it doesn't get any share, go ask for the car themselves
         this.registerTransition(STATE_CNR, STATE_WAI, EVENT_FOUND_SHARE); // if it did find a share, wait for the car to arrive
-        this.registerDefaultTransition(STATE_RID, STATE_WAI);
+        this.registerDefaultTransition(STATE_RID, STATE_RID);
+        this.registerTransition(STATE_RID, STATE_WAI, EVENT_FOUND_CAR);
         this.registerTransition(STATE_WAI, STATE_EVAL, EVENT_FAIL); // if there is a problem with the car ride, go back to eval
         this.registerDefaultTransition(STATE_WAI, STATE_TRC);
 

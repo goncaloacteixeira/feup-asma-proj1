@@ -11,10 +11,8 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Launcher {
     public static void main(String[] args) {
@@ -37,12 +35,15 @@ public class Launcher {
         try {
             Thread.sleep(1000); // time to initialize
 
-            Launcher.launchCars(container, 5, 4);
-            generateMultipleRandomAgents(container, 20);
+            Launcher.launchCars(container, 20, 4);
+            generateMultipleRandomAgents(container, 50);
             //generateTwoAgents(container);
 
-            AgentController results = container.createNewAgent("Results", ResultsAgent.class.getName(), new Object[]{"./results.csv"});
-            results.start();
+            /*AgentController results = container.createNewAgent(
+                    "Results",
+                    ResultsAgent.class.getName(),
+                    new Object[]{String.format("./results/results-%s.csv", new Date().getTime())});
+            results.start();*/
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -74,14 +75,23 @@ public class Launcher {
             String p1 = points.get(0).getName();
             String p2 = points.get(1).getName();
 
-            Graph<Point, DefaultWeightedEdge> graph = GraphUtils.importGraph("citygraph.dot");
+           /* Graph<Point, DefaultWeightedEdge> graph = GraphUtils.importGraph("citygraph.dot");
             var path = GraphUtils.getPathFromAtoB(graph, p1, p2);
-            if (path.getVertexList().size() <= 4) {
+            if (path.getVertexList().size() <= 5) {
                 i--;
                 continue;
+            }*/
+
+            if (random.nextDouble() > 0.8) {
+                int waiters = ThreadLocalRandom.current().nextInt(1, 5 + 1);;
+                for (int j = 1; j <= waiters; j++) {
+                    HumanPreferences settings = new HumanPreferences().carShareInitiator(false);
+                    AgentController ac = container.createNewAgent(String.format("Human-%d-Waiter-%d", i, j), HumanAgent.class.getName(), new Object[]{p1, p2, settings, ep});
+                    agentControllers.add(ac);
+                }
             }
 
-            HumanPreferences settings = new HumanPreferences().carShareInitiator(random.nextDouble() > 0.5);
+            HumanPreferences settings = new HumanPreferences().carShareInitiator(true);
             AgentController ac = container.createNewAgent("Human" + i, HumanAgent.class.getName(), new Object[]{p1, p2, settings, ep});
             agentControllers.add(ac);
         }
