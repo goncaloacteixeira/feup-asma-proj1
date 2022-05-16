@@ -1,0 +1,62 @@
+name,path,initiator,original_cost,final_cost,shared_segments,car_service_fares,num_shared_segments,num_car_service_fares
+Human-1-Waiter-1,"[sem2, sta1, sta3, sta4, sta6, sem7]",False,51.0,64.2149658203125,"[Path: [sem2, sta1], Initiator: false]","[Path: [sta6, sem7], Fare: 27,96, Expected: 22,50]",1,1
+Human-1-Waiter-2,"[sem2, sta1, sta3, sta4, sta6, sem7]",False,51.0,122.12055206298828,[],"[Path: [sem2, sta1], Fare: 59,46, Expected: 22,50, Path: [sta6, sem7], Fare: 36,66, Expected: 22,50]",0,2
+Human-14-Waiter-1,"[sem7, sta6, sta5]",False,24.5,23.37897300720215,[],"[Path: [sem7, sta6], Fare: 11,38, Expected: 22,50]",0,1
+Human-14-Waiter-2,"[sem7, sta6, sta5]",False,24.5,26.19671058654785,[],"[Path: [sem7, sta6], Fare: 14,20, Expected: 22,50]",0,1
+Human-14-Waiter-3,"[sem7, sta6, sta5]",False,24.5,29.73278045654297,[],"[Path: [sem7, sta6], Fare: 17,73, Expected: 22,50]",0,1
+Human-14-Waiter-4,"[sem7, sta6, sta5]",False,24.5,28.277448654174805,[],"[Path: [sem7, sta6], Fare: 16,28, Expected: 22,50]",0,1
+Human-17-Waiter-1,"[sta3, sta4, sta6, sta5, sem5]",False,51.0,53.0765495300293,[],"[Path: [sta5, sem5], Fare: 27,08, Expected: 45,00]",0,1
+Human-17-Waiter-3,"[sta3, sta4, sta6, sta5, sem5]",False,51.0,52.52032470703125,[],"[Path: [sta5, sem5], Fare: 26,52, Expected: 45,00]",0,1
+Human-18-Waiter-2,"[sta2, sta1, sta3, sta4, sta6, sem7, sem8]",False,53.0,48.5,"[Path: [sta6, sem7, sem8], Initiator: false]",[],1,0
+Human-19-Waiter-1,"[sem6, sta3, sta4, sta6]",False,49.0,62.23908233642578,[],"[Path: [sem6, sta3], Fare: 38,24, Expected: 45,00]",0,1
+Human-19-Waiter-2,"[sem6, sta3, sta4, sta6]",False,49.0,84.65064239501953,[],"[Path: [sem6, sta3], Fare: 60,65, Expected: 45,00]",0,1
+Human-19-Waiter-3,"[sem6, sta3, sta4, sta6]",False,49.0,40.5964469909668,[],"[Path: [sem6, sta3], Fare: 16,60, Expected: 45,00]",0,1
+Human-19-Waiter-4,"[sem6, sta3, sta4, sta6]",False,49.0,44.0,"[Path: [sem6, sta3], Initiator: false]",[],1,0
+Human-19-Waiter-5,"[sem6, sta3, sta4, sta6]",False,49.0,105.33416748046876,[],"[Path: [sem6, sta3], Fare: 81,33, Expected: 45,00]",0,1
+Human-28-Waiter-2,"[sem3, sta4, sta6, sta5, sem5]",False,71.5,147.5906219482422,[],"[Path: [sem3, sta4], Fare: 41,52, Expected: 22,50, Path: [sta5, sem5], Fare: 72,07, Expected: 45,00]",0,2
+Human-3-Waiter-3,"[sem5, sem8, sem9]",False,67.5,59.233428955078125,[],"[Path: [sem5, sem8, sem9], Fare: 29,23, Expected: 67,50]",0,1
+Human-36-Waiter-1,"[sem7, sta6, sta4, sta3, sta1, sta2]",False,30.5,39.58308410644531,[],"[Path: [sem7, sta6], Fare: 21,58, Expected: 22,50]",0,1
+Human-44-Waiter-1,"[sem7, sta6, sta4, sem3]",False,47.0,58.81757926940918,[],"[Path: [sem7, sta6], Fare: 5,18, Expected: 22,50, Path: [sta4, sem3], Fare: 31,64, Expected: 22,50]",0,2
+Human-44-Waiter-3,"[sem7, sta6, sta4, sem3]",False,47.0,88.12525177001953,[],"[Path: [sem7, sta6], Fare: 37,92, Expected: 22,50, Path: [sta4, sem3], Fare: 28,21, Expected: 22,50]",0,2
+Human-49-Waiter-2,"[sem7, sem8, sem9]",False,45.0,47.24538040161133,[],"[Path: [sem7, sem8, sem9], Fare: 27,25, Expected: 45,00]",0,1
+Human-49-Waiter-3,"[sem7, sem8, sem9]",False,45.0,81.39039611816406,[],"[Path: [sem7, sem8, sem9], Fare: 61,39, Expected: 45,00]",0,1
+Human-49-Waiter-4,"[sem7, sem8, sem9]",False,45.0,56.833980560302734,[],"[Path: [sem7, sem8, sem9], Fare: 36,83, Expected: 45,00]",0,1
+Human-49-Waiter-5,"[sem7, sem8, sem9]",False,45.0,40.5,"[Path: [sem7, sem8, sem9], Initiator: false]",[],1,0
+Human1,"[sem2, sta1, sta3, sta4, sta6, sem7]",True,51.0,65.2493782043457,[],"[Path: [sem2, sta1], Fare: 6,62, Expected: 22,50, Path: [sta6, sem7], Fare: 32,63, Expected: 22,50]",0,2
+Human11,"[pnt1, sta1, sta3, sta4, sta6]",True,16.0,16.0,[],[],0,0
+Human12,"[sta5, sta6, sta4, sem3]",True,26.5,19.64200782775879,[],"[Path: [sta4, sem3], Fare: 5,64, Expected: 22,50]",0,1
+Human13,"[sem7, sta6, sta4, sta3, sta1, sta2, sem4]",True,53.0,129.15357208251953,[],"[Path: [sem7, sta6], Fare: 37,88, Expected: 22,50, Path: [sta2, sem4], Fare: 63,27, Expected: 22,50]",0,2
+Human14,"[sem7, sta6, sta5]",True,24.5,32.65655708312988,[],"[Path: [sem7, sta6], Fare: 20,66, Expected: 22,50]",0,1
+Human15,"[sem9, sem6, sta3, sta1, sem2]",True,92.0,60.017333984375,[],"[Path: [sem9, sem6, sta3], Fare: 6,73, Expected: 67,50, Path: [sta1, sem2], Fare: 11,29, Expected: 22,50]",0,2
+Human16,"[sta2, sem4]",True,22.5,16.132953643798828,[],"[Path: [sta2, sem4], Fare: 6,13, Expected: 22,50]",0,1
+Human18,"[sta2, sta1, sta3, sta4, sta6, sem7, sem8]",True,53.0,89.9749984741211,"[Path: [sta6, sem7, sem8], Initiator: true]","[Path: [sta6, sem7, sem8], Fare: 61,97, Expected: 45,00]",1,1
+Human19,"[sem6, sta3, sta4, sta6]",True,49.0,103.02384185791016,[],"[Path: [sem6, sta3], Fare: 79,02, Expected: 45,00]",0,1
+Human2,"[pnt1, sta1, sta2, sem4]",True,34.5,79.0383071899414,[],"[Path: [sta2, sem4], Fare: 57,04, Expected: 22,50]",0,1
+Human20,"[pnt1, sta1, sta3, sta4, sta6, sem7, sem8]",True,61.0,45.31095886230469,[],"[Path: [sta6, sem7, sem8], Fare: 9,31, Expected: 45,00]",0,1
+Human21,"[sem5, sem8]",True,45.0,30.31744384765625,[],"[Path: [sem5, sem8], Fare: 10,32, Expected: 45,00]",0,1
+Human22,"[sta3, sta1, pnt1]",True,12.0,12.0,[],[],0,0
+Human24,"[sta2, sta1]",True,2.0,2.0,[],[],0,0
+Human26,"[sem2, sta1, sta3, sta4, sta6]",True,28.5,51.929317474365234,"[Path: [sem2, sta1], Initiator: true]","[Path: [sem2, sta1], Fare: 35,93, Expected: 22,50]",1,1
+Human27,"[sem3, sta4, sta3]",True,24.5,33.366455078125,[],"[Path: [sem3, sta4], Fare: 21,37, Expected: 22,50]",0,1
+Human29,"[sta4, sta3, sta1]",True,4.0,4.0,[],[],0,0
+Human30,"[sem6, sta3, sta1, sem2]",True,69.5,141.72746658325195,"[Path: [sem6, sta3], Initiator: true]","[Path: [sem6, sta3], Fare: 47,08, Expected: 45,00, Path: [sta1, sem2], Fare: 62,65, Expected: 22,50]",1,2
+Human31,"[sem2, sta1, sta3, sta4, sta6, sem7, sem8]",True,73.5,96.65156173706056,[],"[Path: [sem2, sta1], Fare: 42,64, Expected: 22,50, Path: [sta6, sem7, sem8], Fare: 18,02, Expected: 45,00]",0,2
+Human36,"[sem7, sta6, sta4, sta3, sta1, sta2]",True,30.5,56.127838134765625,[],"[Path: [sem7, sta6], Fare: 38,13, Expected: 22,50]",0,1
+Human37,"[sem9, sem6, sta3, sta4]",True,69.5,40.69819641113281,[],"[Path: [sem9, sem6, sta3], Fare: 8,70, Expected: 67,50]",0,1
+Human38,"[pnt1, sta1, sta3, sta4, sta6, sta5, sem5]",True,63.0,58.835670471191406,[],"[Path: [sta5, sem5], Fare: 20,84, Expected: 45,00]",0,1
+Human4,"[pnt1, sem2]",True,10.0,10.0,[],[],0,0
+Human40,"[sta5, sta6, sta4, sem3]",True,26.5,29.32850646972656,[],"[Path: [sta4, sem3], Fare: 15,33, Expected: 22,50]",0,1
+Human41,"[sem6, sta3, sta1, sta2, sem4]",True,71.5,93.05257892608644,[],"[Path: [sem6, sta3], Fare: 51,72, Expected: 45,00, Path: [sta2, sem4], Fare: 7,33, Expected: 22,50]",0,2
+Human42,"[sem6, sem5]",True,10.0,10.0,[],[],0,0
+Human43,"[sta4, sta3, sem6, sem9]",True,69.5,63.02874755859375,[],"[Path: [sta3, sem6, sem9], Fare: 31,03, Expected: 67,50]",0,1
+Human44,"[sem7, sta6, sta4, sem3]",True,47.0,65.36227226257324,[],"[Path: [sem7, sta6], Fare: 20,04, Expected: 22,50, Path: [sta4, sem3], Fare: 23,32, Expected: 22,50]",0,2
+Human45,"[sta4, sta6, sta5, sem5]",True,49.0,60.07576370239258,[],"[Path: [sta5, sem5], Fare: 36,08, Expected: 45,00]",0,1
+Human46,"[sem7, sem8, sem9]",True,45.0,72.21847152709961,[],"[Path: [sem7, sem8, sem9], Fare: 52,22, Expected: 45,00]",0,1
+Human47,"[sem7, sem8, sem5]",True,67.5,36.180864334106445,[],"[Path: [sem7, sem8, sem5], Fare: 6,18, Expected: 67,50]",0,1
+Human48,"[sem9, sem8]",True,22.5,19.85029602050781,[],"[Path: [sem9, sem8], Fare: 9,85, Expected: 22,50]",0,1
+Human49,"[sem7, sem8, sem9]",True,45.0,28.425193786621094,"[Path: [sem7, sem8, sem9], Initiator: true]","[Path: [sem7, sem8, sem9], Fare: 8,43, Expected: 45,00]",1,1
+Human50,"[sta3, sta4, sta6, sta5, sem5]",True,51.0,69.53598022460938,[],"[Path: [sta5, sem5], Fare: 43,54, Expected: 45,00]",0,1
+Human6,"[sem3, sta4, sta3]",True,24.5,30.878448486328125,[],"[Path: [sem3, sta4], Fare: 18,88, Expected: 22,50]",0,1
+Human7,"[sta6, sta4, sta3, sta1, sem2]",True,28.5,30.435386657714844,[],"[Path: [sta1, sem2], Fare: 14,44, Expected: 22,50]",0,1
+Human8,"[sem8, sem9, sem6]",True,45.0,29.550804138183597,[],"[Path: [sem8, sem9, sem6], Fare: 9,55, Expected: 45,00]",0,1
+Human9,"[sem4, sta2, sta1, sta3, sta4, sta6, sta5, sem5]",True,77.5,221.84571075439453,[],"[Path: [sem4, sta2], Fare: 34,33, Expected: 22,50, Path: [sta5, sem5], Fare: 147,52, Expected: 45,00]",0,2
