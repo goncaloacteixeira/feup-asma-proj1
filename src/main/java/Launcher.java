@@ -35,8 +35,8 @@ public class Launcher {
         try {
             Thread.sleep(1000); // time to initialize
 
-            Launcher.launchCars(container, 20, 4);
-            generateMultipleRandomAgents(container, 50);
+            Launcher.launchCars(container, 1, 1);
+            generateMultipleRandomAgents(container, 5);
             //generateTwoAgents(container);
 
             /*AgentController results = container.createNewAgent(
@@ -75,12 +75,12 @@ public class Launcher {
             String p1 = points.get(0).getName();
             String p2 = points.get(1).getName();
 
-           /* Graph<Point, DefaultWeightedEdge> graph = GraphUtils.importGraph("citygraph.dot");
+            Graph<Point, DefaultWeightedEdge> graph = GraphUtils.importGraph("citygraph.dot");
             var path = GraphUtils.getPathFromAtoB(graph, p1, p2);
             if (path.getVertexList().size() <= 5) {
                 i--;
                 continue;
-            }*/
+            }
 
             if (random.nextDouble() > 0.8) {
                 int waiters = ThreadLocalRandom.current().nextInt(1, 5 + 1);;

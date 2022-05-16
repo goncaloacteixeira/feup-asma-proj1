@@ -2,6 +2,13 @@ import datetime
 from os import walk
 import pandas as pd
 import time
+import argparse
+
+ap = argparse.ArgumentParser()
+
+ap.add_argument("-n", "--name", type=str, required=True, help="Output Name")
+
+args = vars(ap.parse_args())
 
 filenames = next(walk("."), (None, None, []))[2]  # [] if no file
 
@@ -16,4 +23,4 @@ for file in filenames:
 
 df = df[df["final_cost"] != 0.0]
 
-df.to_csv("results-" + str(round(time.time())) + ".csv", sep=",", index=False)
+df.to_csv("results-" + args["name"] + ".csv", sep=",", index=False)
