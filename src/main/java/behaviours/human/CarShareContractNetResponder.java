@@ -1,6 +1,7 @@
 package behaviours.human;
 
 import agents.HumanAgent;
+import agents.SharedSegment;
 import graph.GraphUtils;
 import graph.vertex.Point;
 import jade.domain.FIPAAgentManagement.FailureException;
@@ -105,7 +106,8 @@ public class CarShareContractNetResponder extends SSIteratedContractNetResponder
             afterShare += aux;
         }
 
-        ((HumanAgent) myAgent).informResults(new ShareRide(myAgent.getLocalName(), roadPath.getVertexList().toString(), false));
+        ((HumanAgent) myAgent).getResults().addSharedSegment(new SharedSegment(roadPath.getVertexList().toString(), false));
+        // ((HumanAgent) myAgent).informResults(new ShareRide(myAgent.getLocalName(), roadPath.getVertexList().toString(), false));
 
         System.out.printf("%s: Road Path was: %.02f, now: %.02f\n", myAgent.getLocalName(), original, afterShare);
 

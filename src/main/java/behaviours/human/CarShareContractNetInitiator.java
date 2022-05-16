@@ -1,6 +1,7 @@
 package behaviours.human;
 
 import agents.HumanAgent;
+import agents.SharedSegment;
 import graph.vertex.Point;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -136,7 +137,8 @@ public class CarShareContractNetInitiator extends ContractNetInitiator {
         } catch (UnreadableException e) {
             throw new RuntimeException(e);
         }*/
-        ((HumanAgent) myAgent).informResults(new ShareRide(myAgent.getLocalName(), roadPath.getVertexList().toString(), true));
+        ((HumanAgent) myAgent).getResults().addSharedSegment(new SharedSegment(roadPath.getVertexList().toString(), true));
+        // ((HumanAgent) myAgent).informResults(new ShareRide(myAgent.getLocalName(), roadPath.getVertexList().toString(), true));
     }
 
     @Override

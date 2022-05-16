@@ -1,0 +1,14 @@
+name,path,initiator,original_cost,final_cost,shared_segments,car_service_fares,num_shared_segments,num_car_service_fares
+Human-2-Waiter-1,"[sta5, sta6, sta4, sta3, sta1, sta2, sem4]",False,32.5,62.272987365722656,[],"[Path: [sta2, sem4], Fare: 42,27, Expected: 22,50]",0,1
+Human-2-Waiter-2,"[sta5, sta6, sta4, sta3, sta1, sta2, sem4]",False,32.5,30.75,"[Path: [sta2, sem4], Initiator: false]",[],1,0
+Human-2-Waiter-3,"[sta5, sta6, sta4, sta3, sta1, sta2, sem4]",False,32.5,79.87602996826172,[],"[Path: [sta2, sem4], Fare: 59,88, Expected: 22,50]",0,1
+Human-2-Waiter-4,"[sta5, sta6, sta4, sta3, sta1, sta2, sem4]",False,32.5,34.92099571228027,[],"[Path: [sta2, sem4], Fare: 14,92, Expected: 22,50]",0,1
+Human-5-Waiter-1,"[pnt1, sta1, sta3, sta4, sta6, sta5]",False,18.0,18.0,[],[],0,0
+Human-5-Waiter-2,"[pnt1, sta1, sta3, sta4, sta6, sta5]",False,18.0,18.0,[],[],0,0
+Human-5-Waiter-3,"[pnt1, sta1, sta3, sta4, sta6, sta5]",False,18.0,18.0,[],[],0,0
+Human-5-Waiter-4,"[pnt1, sta1, sta3, sta4, sta6, sta5]",False,18.0,18.0,[],[],0,0
+Human1,"[sem1, sem3, sta4, sta6, sem7, sem8]",True,92.0,164.74169921875,[],"[Path: [sem1, sem3, sta4], Fare: 55,92, Expected: 45,00, Path: [sta6, sem7, sem8], Fare: 66,82, Expected: 45,00]",0,2
+Human2,"[sta5, sta6, sta4, sta3, sta1, sta2, sem4]",True,32.5,31.617490768432617,"[Path: [sta2, sem4], Initiator: true]","[Path: [sta2, sem4], Fare: 11,62, Expected: 22,50]",1,1
+Human3,"[sem7, sta6, sta4, sta3, sta1, sta2]",True,30.5,46.78704071044922,[],"[Path: [sem7, sta6], Fare: 28,79, Expected: 22,50]",0,1
+Human4,"[sem5, sta5, sta6, sta4, sta3, sta1, sem2]",True,75.5,181.84539031982425,[],"[Path: [sem5, sta5], Fare: 69,67, Expected: 45,00, Path: [sta1, sem2], Fare: 74,18, Expected: 22,50]",0,2
+Human5,"[pnt1, sta1, sta3, sta4, sta6, sta5]",True,18.0,18.0,[],[],0,0

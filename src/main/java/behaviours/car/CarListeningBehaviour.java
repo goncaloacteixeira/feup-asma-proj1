@@ -19,7 +19,6 @@ public class CarListeningBehaviour extends Behaviour {
     public CarListeningBehaviour(Agent a, CarFSMBehaviour fsm) {
         super(a);
         this.fsm = fsm;
-
         this.done = false;
     }
 
@@ -45,12 +44,13 @@ public class CarListeningBehaviour extends Behaviour {
         CarAgent carAgent = (CarAgent) this.myAgent;
         ServiceUtils.leaveService(carAgent, ServiceUtils.CAR_RIDE);
 
-        this.reset();
         if (this.onHold) {
+            this.reset();
             // if on hold, wait for confirmation to start moving
             return CarFSMBehaviour.EVENT_PROPOSAL_ACCEPTED;
         }
 
+        this.reset();
         // else come back to listening
         return super.onEnd();
     }
@@ -59,5 +59,6 @@ public class CarListeningBehaviour extends Behaviour {
     public void reset() {
         super.reset();
         this.done = false;
+        this.onHold = false;
     }
 }

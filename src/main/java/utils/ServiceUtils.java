@@ -94,6 +94,10 @@ public interface ServiceUtils {
         return agentName + "-" + "ride";
     }
 
+    static String buildShareName(String p1, String p2) {
+        return p1 + "-" + p2;
+    }
+
     /**
      * Sends a string message to all agents in the given service.
      *

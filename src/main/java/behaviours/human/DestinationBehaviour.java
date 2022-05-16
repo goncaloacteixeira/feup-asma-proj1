@@ -19,7 +19,8 @@ class DestinationBehaviour extends OneShotBehaviour {
     @Override
     public void action() {
         double actualCost = GraphUtils.calculateCost(fsmHumanBehaviour.graph, fsmHumanBehaviour.path);
-        ((HumanAgent) myAgent).informResults(new PathEnd(myAgent.getLocalName(), actualCost));
+        ((HumanAgent) myAgent).getResults().setFinalCost(actualCost);
+        ((HumanAgent) myAgent).informResults();
         System.out.printf("%s: Completed Path! Cost: %.02f\n", myAgent.getLocalName(), actualCost);
     }
 }

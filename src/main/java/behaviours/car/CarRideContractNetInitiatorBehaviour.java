@@ -90,6 +90,10 @@ public class CarRideContractNetInitiatorBehaviour extends ContractNetInitiator {
             }
         });
         System.out.printf("%s: sending to %d cars\n", this.myAgent.getLocalName(), totalCars.size());
+        if (totalCars.isEmpty() && this.askCarRideBehaviour.getBestCar() != null) {
+            this.askCarRideBehaviour.confirmBestProposal();
+            return v;
+        }
 
         cfp.setReplyByDate(new Date(System.currentTimeMillis() + 20000)); // waits 20 seconds for cars to respond
         v.addElement(cfp);
@@ -108,9 +112,13 @@ public class CarRideContractNetInitiatorBehaviour extends ContractNetInitiator {
             if (realResponses.isEmpty()) {
                 // this should only run if it is not the first iteration and there is already a saved reply
                 // we accept the saved proposal
-                this.askCarRideBehaviour.confirmBestProposal();
+                if (this.askCarRideBehaviour.getBestCar() != null) {
+                    this.askCarRideBehaviour.confirmBestProposal();
 
-                System.out.printf("%s: no better proposals, accepting saved proposal: %.2f from %s\n", this.myAgent.getLocalName(), this.askCarRideBehaviour.getBestValue(), this.askCarRideBehaviour.getBestCar().getLocalName());
+                    System.out.printf("%s: no better proposals, accepting saved proposal: %.2f from %s\n", this.myAgent.getLocalName(), this.askCarRideBehaviour.getBestValue(), this.askCarRideBehaviour.getBestCar().getLocalName());
+                } else {
+                    this.askCarRideBehaviour.foundNoCars();
+                }
                 return;
             }
 

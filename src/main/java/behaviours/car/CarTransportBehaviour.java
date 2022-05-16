@@ -40,6 +40,12 @@ public class CarTransportBehaviour extends Behaviour {
     }
 
     @Override
+    public void onStart() {
+        System.out.printf("%s: Current Path: %s\n", myAgent.getLocalName(), this.carFSMBehaviour.getCurrentPath().getVertexList());
+        super.onStart();
+    }
+
+    @Override
     public void action() {
         try {
             // if still in the path

@@ -45,6 +45,9 @@ class CNRHelperBehaviour extends Behaviour {
         try {
             Point p1 = fsmHumanBehaviour.path.getVertexList().get(fsmHumanBehaviour.currentLocationIndex);
             Point p2 = GraphUtils.roadStop(fsmHumanBehaviour.graph, fsmHumanBehaviour.path, fsmHumanBehaviour.currentLocationIndex);
+            // Humans either init car share or respond to car sharing when they start a new road travel
+            ServiceUtils.joinService((HumanAgent) this.myAgent, ServiceUtils.buildShareName(p1.getName(), p2.getName()));
+
             System.out.printf("%s: Requesting Car Share from %s to %s\n", myAgent.getLocalName(), p1, p2);
         } catch (NoRoadsException e) {
             throw new RuntimeException(e);

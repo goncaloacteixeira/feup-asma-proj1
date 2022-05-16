@@ -113,4 +113,6 @@ Temporary Items
 
 !libs/*.jar
 *.txt
-*.csv
+**/*.csv
+!results/results*.csv
+.ipynb_checkpoints
