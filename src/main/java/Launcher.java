@@ -35,8 +35,8 @@ public class Launcher {
         try {
             Thread.sleep(1000); // time to initialize
 
-            Launcher.launchCars(container, 1, 1);
-            generateMultipleRandomAgents(container, 5);
+            Launcher.launchCars(container, 5, 1);
+            generateMultipleRandomAgents(container, 10);
             //generateTwoAgents(container);
 
             /*AgentController results = container.createNewAgent(
